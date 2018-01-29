@@ -1,0 +1,478 @@
+{
+  "config": {
+    "sidexpire": 86400,
+    "cidexpire": 600,
+    "cache": "cache",
+    "https": true,
+    "httpspasswd": "odao",
+    "httpskey": "config/h5.key",
+    "httpscert": "config/h5.pem",
+    "imsrv": "im",
+    "mqsrv": "amqp",
+    "deskey": "231m,l/.",
+    "cluster": 1
+  },
+  "server": [
+    {
+      "id": "api",
+      "listen": "*",
+      "port": 6000,
+      "entry": "app.server.Api",
+      "imgsrv": "image",
+      "mediasrv": "media",
+      "sdksrv": "sdk",
+      "enable": "develop,release",
+      "router": [
+        "nnt.server.Provider"
+      ]
+    },
+    {
+      "id": "api",
+      "listen": "*",
+      "port": 6000,
+      "entry": "app.server.Api",
+      "imgsrv": "image",
+      "mediasrv": "media",
+      "sdksrv": "sdk",
+      "enable": "debug",
+      "router": [
+        "nnt.server.Provider"
+      ]
+    },
+    {
+      "id": "image",
+      "listen": "*",
+      "port": 6001,
+      "entry": "nnt.server.ImageStore",
+      "store": "assets://upload/",
+      "enable": "develop"
+    },
+    {
+      "id": "image",
+      "listen": "*",
+      "port": 6001,
+      "entry": "nnt.server.ImageStore",
+      "store": "../appsrv-work/assets/upload/",
+      "enable": "debug"
+    },
+    {
+      "id": "image",
+      "listen": "*",
+      "port": 6001,
+      "entry": "nnt.server.ImageStore",
+      "store": "../../uploads",
+      "enable": "release"
+    },
+    {
+      "id": "media",
+      "listen": "*",
+      "port": 6002,
+      "entry": "nnt.server.MediaStore",
+      "store": "assets://upload/",
+      "enable": "develop"
+    },
+    {
+      "id": "media",
+      "listen": "*",
+      "port": 6002,
+      "entry": "nnt.server.MediaStore",
+      "store": "../appsrv-work/assets/upload/",
+      "enable": "debug"
+    },
+    {
+      "id": "media",
+      "listen": "*",
+      "port": 6002,
+      "entry": "nnt.server.MediaStore",
+      "store": "../../uploads",
+      "enable": "release"
+    },
+    {
+      "id": "amqp",
+      "host": "data.h5group.com",
+      "user": "webapp",
+      "password": "webapp",
+      "entry": "nnt.server.Amqpmq",
+      "channel": {
+        "user.online": {
+          "type": "fanout",
+          "durable": false,
+          "longliving": true
+        }
+      },
+      "enable": "local"
+    },
+    {
+      "id": "amqp",
+      "host": "47.96.43.62",
+      "user": "webapp",
+      "password": "webapp",
+      "entry": "nnt.server.Amqpmq",
+      "channel": {
+        "user.online": {
+          "type": "fanout",
+          "durable": false,
+          "longliving": true
+        }
+      },
+      "enable": "release"
+    },
+    {
+      "id": "live",
+      "listen": "*",
+      "port": 6003,
+      "entry": "app.server.Live",
+      "enable": "develop,release"
+    },
+    {
+      "id": "live",
+      "listen": "*",
+      "port": 6003,
+      "entry": "app.server.Live",
+      "enable": "debug"
+    },
+    {
+      "id": "im",
+      "attach": "live",
+      "entry": "app.server.Chat"
+    },
+    {
+      "id": "sms",
+      "listen": "localhost",
+      "port": 6004,
+      "entry": "nnt.thirds.sms.Hangyuan",
+      "user": "douzihy",
+      "passwd": "dzhy6688@hy.net",
+      "type": "douziyzm",
+      "code": "5017",
+      "url": "sms.easyct.net",
+      "sign": "【豆子互娱】"
+    },
+    {
+      "id": "push",
+      "listen": "localhost",
+      "port": 6006,
+      "entry": "nnt.thirds.push.JPush",
+      "key": "36d2889260df2fd0463438f9",
+      "secret": "bf6faa118743a3443feee726"
+    },
+    {
+      "id": "sdk",
+      "listen": "*",
+      "port": 6005,
+      "entry": "nnt.sdk.Sdk",
+      "dbsrv": "kv",
+      "imgsrv": "image",
+      "mediasrv": "media",
+      "restsrv": "api",
+      "mqsrv": "amqp",
+      "channel": [
+        {
+          "id": "common"
+        },
+        {
+          "id": "phone"
+        },
+        {
+          "id": "apicloud"
+        },
+        {
+          "id": "apple",
+          "sandbox": true
+        },
+        {
+          "id": "wechat",
+          "appid": "wxf466204308ca7278",
+          "appsecret": "380f258ac544534859f67698c9733006",
+          "nativeid": "wxfc983573261a5210",
+          "nativesecret": "f69ea261e833559d56418e7e6ecf7540",
+          "appid_mini": "wx1c721a2e355de9ba",
+          "appsecret_mini": "66de48a97a8959491ac4f16dfa10e45b",
+          "redirecturl": "https://h5.douzi.com",
+          "pubid": "wx4224663bb4f0ed80",
+          "pubsecret": "bc5fe79fbe136e9ca2521d0c5d66bd05",
+          "pubmchid": "1493798462",
+          "pubkey": "shanghaidouziwangluokejigongsih5",
+          "payid": "wxfc983573261a5210",
+          "paykey": "shanghaidouziwangluokejigongsih5",
+          "paymchid": "1494209122",
+          "noticeurl": "https://h5.douzi.com:6000/action/shop.done"
+        },
+        {
+          "id": "wxminiapp",
+          "appid": "wx1c721a2e355de9ba",
+          "appsecret": "66de48a97a8959491ac4f16dfa10e45b",
+          "pubid": "wx4224663bb4f0ed80",
+          "pubsecret": "bc5fe79fbe136e9ca2521d0c5d66bd05",
+          "pubmchid": "1493798462",
+          "pubkey": "shanghaidouziwangluokejigongsih5",
+          "payid": "wxfc983573261a5210",
+          "paykey": "shanghaidouziwangluokejigongsih5",
+          "paymchid": "1494209122",
+          "noticeurl": "https://h5.douzi.com:6000/action/shop.done"
+        }
+      ]
+    },
+    {
+      "id": "apidoc",
+      "port": 5000,
+      "index": "main.js",
+      "root": "~/src/contrib/apidoc/apidoc/",
+      "entry": "contrib.apidoc.ApiDoc",
+      "enable": "develop",
+      "host": "api.h5group.com:6000",
+      "wshost": "api.h5group.com:6003"
+    },
+    {
+      "id": "apidoc",
+      "port": 5000,
+      "index": "main.js",
+      "root": "~/src/contrib/apidoc/apidoc/",
+      "entry": "contrib.apidoc.ApiDoc",
+      "enable": "debug",
+      "host": "localhost:6000",
+      "wshost": "localhost:6003"
+    },
+    {
+      "id": "apidoc",
+      "port": 5000,
+      "index": "main.js",
+      "root": "~/src/contrib/apidoc/apidoc/",
+      "entry": "contrib.apidoc.ApiDoc",
+      "enable": "release",
+      "host": "h5.douzi.com:6000",
+      "wshost": "h5.douzi.com:6003"
+    },
+    {
+      "id": "manager-api",
+      "port": 5002,
+      "entry": "contrib.manager.Manager",
+      "dbsrv": "kv",
+      "mcsrv": "rd",
+      "imgsrv": "image",
+      "genapi": [
+        {
+          "model": [
+            "entry://nnt/core/models",
+            "entry://app/model/common",
+            "entry://app/model/code",
+            "entry://app/model/item",
+            "entry://app/model/user",
+            "entry://app/model/shop",
+            "entry://app/model/taskmoniter"
+          ],
+          "router": [
+            "entry://app/router/user",
+            "entry://app/router/shop",
+            "entry://app/router/taskmoniter"
+          ],
+          "out": [
+            "apidoc://api/api.ts",
+            "../webapp/src/api/api.ts"
+          ]
+        },
+        {
+          "model": [
+            "entry://nnt/core/models",
+            "entry://app/model/common",
+            "entry://app/model/code",
+            "entry://app/model/item",
+            "entry://app/model/user",
+            "entry://app/model/shop",
+            "entry://app/model/statis",
+            "entry://app/model/taskmoniter",
+            "entry://app/model/admin",
+            "entry://contrib/manager/model/manager"
+          ],
+          "router": [
+            "entry://contrib/manager/router/manager",
+            "entry://app/router/admin"
+          ],
+          "out": [
+            "manager://api/api.ts"
+          ]
+        }
+      ],
+      "genconfig": [
+        {
+          "in": "../h5group/design/小程序/配置表/",
+          "server": "~/src/app/model/xlsconfigs.ts",
+          "client": "../webapp/src/api/configs.ts"
+        }
+      ],
+      "gendb": [
+        {
+          "model": [
+            "entry://app/model/common",
+            "entry://app/model/code",
+            "entry://app/model/item",
+            "entry://app/model/user",
+            "entry://app/model/shop",
+            "entry://app/model/statis",
+            "entry://app/model/taskmoniter",
+            "entry://app/model/admin",
+            "entry://contrib/manager/model/manager"
+          ],
+          "out": [
+            "~/doc/db.xlsx"
+          ]
+        }
+      ],
+      "router": [
+        "app.router.Admin"
+      ]
+    },
+    {
+      "id": "manager",
+      "port": 5001,
+      "index": "main.js",
+      "root": "~/src/contrib/manager/portal",
+      "entry": "contrib.manager.Portal",
+      "host": "localhost:5002",
+      "enable": "debug"
+    },
+    {
+      "id": "manager",
+      "port": 5001,
+      "index": "main.js",
+      "root": "~/src/contrib/manager/portal",
+      "entry": "contrib.manager.Portal",
+      "host": "localhost:5002",
+      "enable": "develop"
+    },
+    {
+      "id": "manager",
+      "port": 5001,
+      "index": "main.js",
+      "root": "~/src/contrib/manager/portal",
+      "entry": "contrib.manager.Portal",
+      "host": "h5.douzi.com:5002",
+      "enable": "release"
+    }
+  ],
+  "container": [
+
+  ],
+  "dbms": [
+    {
+      "id": "kv",
+      "host": "data.h5group.com:27017",
+      "scheme": "wxsrv",
+      "user": "wxsrv",
+      "password": "wxsrv",
+      "entry": "nnt.store.KvMongo",
+      "enable": "local"
+    },
+    {
+      "id": "kv",
+      "repl": {
+        "name": "mgset-4921993",
+        "server": [
+          "dds-bp1d814eac81b2c41.mongodb.rds.aliyuncs.com:3717",
+          "dds-bp1d814eac81b2c42.mongodb.rds.aliyuncs.com:3717"
+        ]
+      },
+      "scheme": "wxsrv",
+      "user": "wxsrv",
+      "password": "wxsrv",
+      "entry": "nnt.store.KvMongo",
+      "enable": "release"
+    },
+    {
+      "id": "ss",
+      "host": "data.h5group.com:27017",
+      "scheme": "wxstatis",
+      "user": "wxsrv",
+      "password": "wxsrv",
+      "entry": "nnt.store.KvMongo",
+      "enable": "local"
+    },
+    {
+      "id": "ss",
+      "repl": {
+        "name": "mgset-4921993",
+        "server": [
+          "dds-bp1d814eac81b2c41.mongodb.rds.aliyuncs.com:3717",
+          "dds-bp1d814eac81b2c42.mongodb.rds.aliyuncs.com:3717"
+        ]
+      },
+      "scheme": "wxstatis",
+      "user": "wxsrv",
+      "password": "wxsrv",
+      "entry": "nnt.store.KvMongo",
+      "enable": "release"
+    },
+    {
+      "id": "guessnum",
+      "host": "data.h5group.com:27017",
+      "scheme": "guessnum",
+      "user": "wxsrv",
+      "password": "wxsrv",
+      "entry": "nnt.store.KvMongo",
+      "enable": "local"
+    },
+    {
+      "id": "guessnum",
+      "repl": {
+        "name": "mgset-4921993",
+        "server": [
+          "dds-bp1d814eac81b2c41.mongodb.rds.aliyuncs.com:3717",
+          "dds-bp1d814eac81b2c42.mongodb.rds.aliyuncs.com:3717"
+        ]
+      },
+      "scheme": "guessnum",
+      "user": "wxsrv",
+      "password": "wxsrv",
+      "entry": "nnt.store.KvMongo",
+      "enable": "release"
+    },
+    {
+      "id": "rd",
+      "host": "data.h5group.com",
+      "cluster": false,
+      "dbid": 0,
+      "password": "redis",
+      "enable": "local",
+      "entry": "nnt.store.KvRedis"
+    },
+    {
+      "id": "rd",
+      "host": "r-bp12f4e25af50854.redis.rds.aliyuncs.com",
+      "cluster": false,
+      "dbid": 0,
+      "password": "Douzihuyu2018",
+      "enable": "release",
+      "entry": "nnt.store.KvRedis"
+    }
+  ],
+  "logger": [
+    {
+      "id": "console",
+      "filter": "all",
+      "entry": "nnt.logger.Console"
+    },
+    {
+      "id": "file",
+      "filter": "all",
+      "entry": "nnt.logger.Log4Ts",
+      "config": {
+        "appenders": {
+          "multi": {
+            "type": "multiFile",
+            "base": "logs/",
+            "property": "TODAY",
+            "extension": ".log"
+          }
+        },
+        "categories": {
+          "default": {
+            "appenders": [
+              "multi"
+            ],
+            "level": "debug"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+windows:
+1，安装VS2015或以上，只保留C++
+2，cmd中 cnpm install -g windows-build-tools
+3, cnpm install -g node-gyp
+4, 安装Python2.6/2.7
+5, cnpm install -g typescript
+6, 根目录下执行 cnpm install
+
+linux:
+1, cnpm install -g node-gyp
+2, cnpm install -g typescript
+3, 安装Python2.6/2.7
+4，根目录下执行 cnpm install
+
+运行：
+node index.js [--debug|--develop]

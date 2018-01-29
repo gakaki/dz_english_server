@@ -1,0 +1,2 @@
+cnpm install wsdl-to-ts
+node ./node_modules/wsdl-to-ts/lib/index.js "http://106.15.42.125:8899/sms/webService/smsOper?wsdl"
