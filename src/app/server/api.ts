@@ -8,6 +8,7 @@ import {StatisAction} from "../model/statis";
 import {TODAY_RANGE} from "../../nnt/component/today";
 import {Node} from "../../nnt/config/config";
 import {static_cast} from "../../nnt/core/core";
+import {Guessnum} from "../router/guessnum";
 
 interface ApiCfg {
     sdksrv: string;
@@ -22,6 +23,7 @@ export class Api extends Rest {
         let routers = this.routers;
         routers.register(new User());
         routers.register(new Shop());
+        routers.register(new Guessnum());
     }
 
     config(cfg: Node): boolean {
