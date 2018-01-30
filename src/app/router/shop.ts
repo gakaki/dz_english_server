@@ -1,7 +1,7 @@
 import {action, debug, develop, IRouter} from "../../nnt/core/router";
 import {RechargeRecord, TestOrder} from "../model/shop";
 import {Trans} from "../server/trans";
-import {Null, STATUS} from "../../nnt/core/models";
+import {mid_str, Null, STATUS} from "../../nnt/core/models";
 import {Insert, Update} from "../../nnt/manager/dbmss";
 import {Delta, Item} from "../model/item";
 import {User} from "./user";
@@ -13,6 +13,9 @@ import {Api} from "../server/api";
 import {CompletePay, SdkPayOrderId} from "../../nnt/sdk/msdk";
 import {logger} from "../../nnt/core/logger";
 import {ItemRecordType} from "../model/user";
+import {Msg} from "./msg";
+import {DOMAIN_USERS, SYSTEM} from "../../nnt/server/im";
+import {ImChatMsg, ImMsgSubType, ImMsgType} from "../model/msg";
 
 export class Shop implements IRouter {
     action = "shop";
@@ -111,12 +114,12 @@ export class Shop implements IRouter {
         User.ApplyDelta(ui, delta.record(ItemRecordType.BUY));
 
         // 发送到账消息
-        // Msg.SysChat({
-        //     from: mid_str(SYSTEM, DOMAIN_USERS),
-        //     to: mid_str(ui.pid, DOMAIN_USERS),
-        //     type: ImMsgType.CHAT,
-        //     payload: new ImChatMsg(ImMsgSubType.PAY_DONE)
-        // });
+        Msg.SysChat({
+            from: mid_str(SYSTEM, DOMAIN_USERS),
+            to: mid_str(ui.pid, DOMAIN_USERS),
+            type: ImMsgType.CHAT,
+            payload: new ImChatMsg(ImMsgSubType.PAY_DONE)
+        });
 
         //到账消息通过websocket通知。。
 

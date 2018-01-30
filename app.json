@@ -89,7 +89,7 @@
     },
     {
       "id": "amqp",
-      "host": "data.h5group.com",
+      "host": "10.1.70.106",
       "user": "webapp",
       "password": "webapp",
       "entry": "nnt.server.Amqpmq",
@@ -356,7 +356,7 @@
   "dbms": [
     {
       "id": "kv",
-      "host": "data.h5group.com:27017",
+      "host": "10.1.70.106:27017",
       "scheme": "wxsrv",
       "user": "wxsrv",
       "password": "wxsrv",
@@ -380,7 +380,7 @@
     },
     {
       "id": "ss",
-      "host": "data.h5group.com:27017",
+      "host": "10.1.70.106:27017",
       "scheme": "wxstatis",
       "user": "wxsrv",
       "password": "wxsrv",
@@ -403,32 +403,8 @@
       "enable": "release"
     },
     {
-      "id": "guessnum",
-      "host": "data.h5group.com:27017",
-      "scheme": "guessnum",
-      "user": "wxsrv",
-      "password": "wxsrv",
-      "entry": "nnt.store.KvMongo",
-      "enable": "local"
-    },
-    {
-      "id": "guessnum",
-      "repl": {
-        "name": "mgset-4921993",
-        "server": [
-          "dds-bp1d814eac81b2c41.mongodb.rds.aliyuncs.com:3717",
-          "dds-bp1d814eac81b2c42.mongodb.rds.aliyuncs.com:3717"
-        ]
-      },
-      "scheme": "guessnum",
-      "user": "wxsrv",
-      "password": "wxsrv",
-      "entry": "nnt.store.KvMongo",
-      "enable": "release"
-    },
-    {
       "id": "rd",
-      "host": "data.h5group.com",
+      "host": "10.1.70.106",
       "cluster": false,
       "dbid": 0,
       "password": "redis",
