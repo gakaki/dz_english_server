@@ -1,5 +1,5 @@
-import {array, double, input, integer, model, output, required, string, type} from "../../nnt/core/proto";
-import {colarray, coldouble, colinteger, colstring, coltype, table} from "../../nnt/store/proto";
+import {array, boolean, double, input, integer, model, output, required, string, type} from "../../nnt/core/proto";
+import {colarray, colboolean, coldouble, colinteger, colstring, coltype, table} from "../../nnt/store/proto";
 import {DateTime} from "../../nnt/core/time";
 import {UserInfo} from "./user";
 
@@ -8,38 +8,58 @@ import {UserInfo} from "./user";
 @model()
 @table('kv', 'packInfo',{ttl:24*60*1000})
 export class PackInfo {
-    @string(1, [output], "红包id")
-    @colstring()
+    @integer(1, [output], "红包id")
+    @colinteger()
     pid: string;
 
     @double(2, [input,output], "钱数")
     @coldouble()
     money: number;
 
-    @string(3, [input,output], "sid")
-    @colstring()
-    sid:string;
-
-    @type(4, UserInfo, [output], "用户信息")
+    @type(3, UserInfo, [output], "用户信息")
     userInfo:UserInfo;
 
-    @type(6,DateTime,[output],"创建时间")
-    @coltype(DateTime)
-    createTime=DateTime.Now;
+    @string(4,[output],"创建时间")
+    @colstring()
+    createTime:string;
 
-    @type(5,Set,[output],"数字密码")
-    @colarray(Set)
-    password=new Set();
+    @string(5,[output],"数字密码")
+    @colstring()
+    password:string;
 
-    @integer(7,[output],"剩余竞猜次数")
+    @integer(6,[output],"剩余竞猜次数")
     @colinteger()
-    guessCount=20
+    guessCount=20;
+
+    @boolean(7,[input,output],"是否使用红包券")
+    @colboolean()
+    useTicket:boolean;
+
+    @boolean(8,[],"是否4A")
+    AAAA:boolean;
+    @boolean(9,[],"是否3A")
+    AAA:boolean;
+    @boolean(10,[],"是否2A")
+    AA:boolean;
+    @boolean(11,[],"是否A")
+    A:boolean
 }
 
 @model()
 export class Guess{
-    
-    guessNum=new Set()
+    @string(1,[input],"竞猜数字")
+    guessNum:string;
+
+    @integer(2,[input],"红包id")
+    pid:number;
+
+    @string(3,[output],"用户竞猜答案")
+    mark:string;
+
+    @double(4,[output],"用户获得的金钱")
+    moneyGeted:number;
+
+
 }
 
 
