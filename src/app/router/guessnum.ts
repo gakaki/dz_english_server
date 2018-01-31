@@ -1,11 +1,11 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
-import {ClearCD, Guess, PackInfo} from "../model/guessnum";
+import {ClearCD, Guess, PackGuessRecord, PackInfo, PackRecords} from "../model/guessnum";
 import {Trans} from "../../contrib/manager/trans";
 import {UserInfo} from "../model/user";
 import {User} from "./user";
 import {Code} from "../model/code";
 import {Random} from "../../nnt/core/kernel";
-import {Insert, Query, Update} from "../../nnt/manager/dbmss";
+import {Insert, Query, QueryAll, Update} from "../../nnt/manager/dbmss";
 import {DateTime} from "../../nnt/core/time";
 import {colarray, coldouble, colinteger, colstring, coltype} from "../../nnt/store/proto";
 import {double, integer, string, type} from "../../nnt/core/proto";
@@ -47,12 +47,12 @@ export class Guessnum implements IRouter {
             trans.submit();
             return
         }
-        let ui:UserInfo=await User.FindUserBySid(trans.sid);
+      /*  let ui:UserInfo=await User.FindUserBySid(trans.sid);
         if(ui==null){
             trans.status = Code.USER_NOT_FOUND;
             trans.submit();
             return
-        }
+        }*/
         if(pack.status != Code.PACK_Fighing){
             trans.status = pack.status;
             trans.submit();
@@ -84,7 +84,6 @@ export class Guessnum implements IRouter {
             console.log("不存在CD列表");
             pack.CDList={};
         }
-
 
 
         let result=Guessnum.guessCompare(m.guessNum,pack.password);
@@ -135,6 +134,7 @@ export class Guessnum implements IRouter {
         await Guessnum.updatePack(pack);
         console.log("结束");
         console.log(pack.CDList);
+        await Guessnum.saveUserGuessRecord("123",m.guessNum,m.moneyGeted,m.mark,m.pid);
         trans.submit();
     }
 
@@ -142,12 +142,12 @@ export class Guessnum implements IRouter {
     async clearcd(trans:Trans){
         console.log("没有进来？");
         let m:ClearCD = trans.model;
-        let ui:UserInfo=await User.FindUserBySid(trans.sid);
+        /*let ui:UserInfo=await User.FindUserBySid(trans.sid);
         if(ui==null){
             trans.status = Code.USER_NOT_FOUND;
             trans.submit();
             return
-        }
+        }*/
         let pack=await Guessnum.getGuessPack(m.pid);
         if(pack == null){
             trans.status = Code.PACK_EMPTY;
@@ -174,6 +174,35 @@ export class Guessnum implements IRouter {
             trans.status = Code.PACK_Fighing;
         }
         trans.submit();
+    }
+
+    @action(PackRecords)
+    async getpackrecords(trans:Trans){
+        let m:PackRecords=trans.model;
+        let pack=await Guessnum.getGuessPack(m.pid);
+        if(pack == null){
+            trans.status = Code.PACK_EMPTY;
+            trans.submit();
+            return
+        }
+       /*   let ui:UserInfo=await User.FindUserBySid(trans.sid);
+       if(ui==null){
+           trans.status = Code.USER_NOT_FOUND;
+           trans.submit();
+           return
+       }*/
+        m.packPassword=pack.password;
+        m.packInfo={
+            totalMoney:pack.money,
+            restMoney:pack.remain
+        };
+        let records=await Guessnum.getPackGuessRecords(m.pid);
+        console.log("查询的记录");
+        console.log(records);
+        m.records=records;
+        console.log(m);
+        trans.submit();
+
     }
 
     protected static getPack(){
@@ -246,6 +275,20 @@ export class Guessnum implements IRouter {
     }
     protected static async updatePack(pack:PackInfo){
         await Update(PackInfo,null,[{pid:pack.pid},pack])
+    }
+
+    protected static async saveUserGuessRecord(uid:string,userAnswerWord:string,userGetMoney:number,userMark:string,pid:number){
+        await Insert(PackGuessRecord,{
+            uid:uid,
+            pid:pid,
+            userAnswerWord:userAnswerWord,
+            userGetMoney:userGetMoney,
+            userMark:userMark
+        })
+    }
+
+    protected static async getPackGuessRecords(pid:number){
+        return await QueryAll(PackGuessRecord,{pid:pid});
     }
 
 }

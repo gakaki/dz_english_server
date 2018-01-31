@@ -1,7 +1,11 @@
-import {array, boolean, double, input, integer, model, output, required, string, type} from "../../nnt/core/proto";
+import {
+    array, boolean, double, input, integer, json, model, output, required, string,
+    type
+} from "../../nnt/core/proto";
 import {colarray, colboolean, coldouble, colinteger, coljson, colstring, coltype, table} from "../../nnt/store/proto";
 import {DateTime} from "../../nnt/core/time";
 import {UserInfo} from "./user";
+import {any} from "async";
 
 
 
@@ -85,18 +89,34 @@ export class ClearCD{
 @model()
 @table('kv','packGuess_records')
 export class PackGuessRecord{
-    @string(1,[output],"红包竞猜记录id")
+
     @colstring()
-    pid:string;
+    uid:string;
 
-    @type(2, UserInfo, [input], "用户信息")
-    userInfo:UserInfo;
+    @colinteger()
+    pid:number;
 
-    @string(3,[output],"红包竞猜数字")
     @colstring()
-    numberWord:string;
+    userAnswerWord:string;
 
-    @double(4,[output],"获取的钱数")
     @coldouble()
-    money:number;
+    userGetMoney:number;
+
+    @colstring()
+    userMark:string;
+
+}
+@model()
+export class PackRecords{
+    @integer(1,[input],"红包id")
+    pid:number;
+
+    @string(2,[output],"红包竞猜答案")
+    packPassword:string;
+
+    @json(3,[output],"红包详情")
+    packInfo:any;
+
+    @array(4,PackGuessRecord,[output],"抢红包记录")
+    records:PackGuessRecord[];
 }
