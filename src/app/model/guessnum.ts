@@ -1,5 +1,5 @@
 import {array, boolean, double, input, integer, model, output, required, string, type} from "../../nnt/core/proto";
-import {colarray, colboolean, coldouble, colinteger, colstring, coltype, table} from "../../nnt/store/proto";
+import {colarray, colboolean, coldouble, colinteger, coljson, colstring, coltype, table} from "../../nnt/store/proto";
 import {DateTime} from "../../nnt/core/time";
 import {UserInfo} from "./user";
 
@@ -15,6 +15,10 @@ export class PackInfo {
     @double(2, [input,output], "钱数")
     @coldouble()
     money: number;
+
+    @double(9,[output],"剩余金额")
+    @coldouble()
+    remain:number;
 
     @type(3, UserInfo, [output], "用户信息")
     userInfo:UserInfo;
@@ -35,14 +39,24 @@ export class PackInfo {
     @colboolean()
     useTicket:boolean;
 
-    @boolean(8,[],"是否4A")
+    @colboolean()
     AAAA:boolean;
-    @boolean(9,[],"是否3A")
+
+    @colboolean()
     AAA:boolean;
-    @boolean(10,[],"是否2A")
+
+    @colboolean()
     AA:boolean;
-    @boolean(11,[],"是否A")
-    A:boolean
+
+    @colboolean()
+    A:boolean;
+
+    @integer(8,[output],"红包状态")
+    @colinteger()
+    status:number;
+
+    @coljson()
+    CDList:any;
 }
 
 @model()
@@ -59,7 +73,12 @@ export class Guess{
     @double(4,[output],"用户获得的金钱")
     moneyGeted:number;
 
+}
 
+@model()
+export class ClearCD{
+    @integer(1,[input],"红包id")
+    pid:number;
 }
 
 
