@@ -88,17 +88,98 @@ interface pair <K, V> {k:K;v:V;}
         cfg:any;
     }
 
+    export class Question {
+        //id
+        get id():number { return this.cfg[0]; } 
+        //问题
+        get question():string { return this.cfg[1]; } 
+        //答案
+        get answer():string { return this.cfg[2]; } 
+        
+        static INDEX_ID = 0;
+        static INDEX_QUESTION = 1;
+        static INDEX_ANSWER = 2;
+        
+        
+        static Get(key:number):Question {return key in _questionMap ? new Question(_questionMap[key]) : null;}
+        constructor(d:any) { this.cfg = d; }
+        cfg:any;
+    }
+
+    export class Topic {
+        //id
+        get id():number { return this.cfg[0]; } 
+        //标题
+        get topic():string { return this.cfg[1]; } 
+        
+        static INDEX_ID = 0;
+        static INDEX_TOPIC = 1;
+        
+        
+        static Get(key:number):Topic {return key in _topicMap ? new Topic(_topicMap[key]) : null;}
+        constructor(d:any) { this.cfg = d; }
+        cfg:any;
+    }
+
+    export class Distribution {
+        //id
+        get id():number { return this.cfg[0]; } 
+        //A+B数值
+        get determine():number { return this.cfg[1]; } 
+        //第一次猜到的最小比例
+        get firstmin():number { return this.cfg[2]; } 
+        //第一次猜到的最大比例
+        get firstmax():number { return this.cfg[3]; } 
+        //之后的最小比例
+        get min():number { return this.cfg[4]; } 
+        //之后猜到的最大的比例
+        get max():number { return this.cfg[5]; } 
+        
+        static INDEX_ID = 0;
+        static INDEX_DETERMINE = 1;
+        static INDEX_FIRSTMIN = 2;
+        static INDEX_FIRSTMAX = 3;
+        static INDEX_MIN = 4;
+        static INDEX_MAX = 5;
+        
+        
+        static Get(key:number):Distribution {return key in _distributionMap ? new Distribution(_distributionMap[key]) : null;}
+        constructor(d:any) { this.cfg = d; }
+        cfg:any;
+    }
+
+    export class Share {
+        //id
+        get id():number { return this.cfg[0]; } 
+        //分享标题
+        get title():string { return this.cfg[1]; } 
+        //链接
+        get link():unknown { return this.cfg[2]; } 
+        //图片
+        get image():unknown { return this.cfg[3]; } 
+        
+        static INDEX_ID = 0;
+        static INDEX_TITLE = 1;
+        static INDEX_LINK = 2;
+        static INDEX_IMAGE = 3;
+        
+        
+        static Get(key:number):Share {return key in _shareMap ? new Share(_shareMap[key]) : null;}
+        constructor(d:any) { this.cfg = d; }
+        cfg:any;
+    }
+
 
     export const guessstarts:Array<any> = [
-        [1,1],[2,5],[3,10]
+        [1,1.68],[2,6.6],[3,8.8]
         ];
 
     export const parameters:Array<any> = [
-        ["timeslimit","20"],["waitcd","180"],["expire","24"]
+        ["timeslimit","20"],["waitcd","180"],["expire","24"],["rewardmax","50000"]
         ];
 
     export const messages:Array<any> = [
-        [1,"红包已过期"],[2,"请输入0-9不重复4位数"],[3,"赏金至少100金币"],[4,"赏金至少1元"],[5,"答错了"],[6,"恭喜答对"]
+        [1,"竞猜pk已过期"],[2,"赏金至少1元"],[3,"答错了"],[4,"恭喜答对"],[5,"赏金上限50000元"],[6,"赏金已领取完毕"],[7,"竞猜次数达到上限"]
         ];
 
     export const evaluates:Array<any> = [
@@ -109,6 +190,22 @@ interface pair <K, V> {k:K;v:V;}
         [1,"现金"],[2,"代金券"],[3,"加速卡"]
         ];
 
+    export const questions:Array<any> = [
+        [1,"旺猜怎么玩？","发起旺猜红包至好友或群聊中，好有猜中红包口令可领取到红包中现金。"],[2,"我支付了但没有发出去？","请在主页的【我的记录】中找到相应的记录，点击进入详情后点击【去转发】可把红包转发给好友或群，也可以生成朋友圈分享图后发朋友圈。"],[3,"好友可以转发我的旺猜红包吗？","可以的，您分享给好友或者转发到微信群的旺猜红包，其他好友均可再次转发。"],[4,"发旺猜红包会收取服务费吗？","发起旺猜红包不会收取服务费。"],[5,"未领取的金额会怎样处理？","未领取的金额将于24小时后退至【小程序】余额"],[6,"如何提现到微信钱包？","在主页【余额提现】或详情页的【去提现】均可跳转至余额提现页面进行提现，提现金额每次至少2元，每天至多提现3次。"],[7,"提现会收取服务费吗？多久到账？","提现收取2%的服务费；申请提现后会在1-5个工作日内转账到您的微信钱包。"],[8,"如何联系客服？（客服在线时间：9:00-18:00）","您可以点击本页下方的联系客服按钮联系我们的在线客服；也可以拨打我们的客服电话："]
+        ];
+
+    export const topics:Array<any> = [
+        [1,"新年快乐！快来领福利"],[2,"新年快乐！你们的礼物在这里"],[3,"大家来拼智力领奖励"],[4,"我猜对了答案，你行吗？"],[5,"能猜出答案算你赢"],[6,"最最最难难难的猜题pk"]
+        ];
+
+    export const distributions:Array<any> = [
+        [1,1,0.03,0.04,0,0.01],[2,2,0.04,0.06,0.01,0.02],[3,3,0.06,0.08,0.02,0.03],[4,4,0.08,0.1,0.03,0.04]
+        ];
+
+    export const shares:Array<any> = [
+        [1,"大家一起来拼智力领红包",,],[2,"大家一起来拼智力领红包",,],[3,"我领取到了s%元现金，快来看看我的战绩",,],[4,"大家一起来拼智力领红包",,]
+        ];
+
 
         t = guessstarts;
         let _guessstartMap:any = {
@@ -117,12 +214,12 @@ interface pair <K, V> {k:K;v:V;}
 
         t = parameters;
         let _parameterMap:any = {
-        "timeslimit":t[0],"waitcd":t[1],"expire":t[2]
+        "timeslimit":t[0],"waitcd":t[1],"expire":t[2],"rewardmax":t[3]
         };
 
         t = messages;
         let _messageMap:any = {
-        1:t[0],2:t[1],3:t[2],4:t[3],5:t[4],6:t[5]
+        1:t[0],2:t[1],3:t[2],4:t[3],5:t[4],6:t[5],7:t[6]
         };
 
         t = evaluates;
@@ -133,6 +230,26 @@ interface pair <K, V> {k:K;v:V;}
         t = items;
         let _itemMap:any = {
         1:t[0],2:t[1],3:t[2]
+        };
+
+        t = questions;
+        let _questionMap:any = {
+        1:t[0],2:t[1],3:t[2],4:t[3],5:t[4],6:t[5],7:t[6],8:t[7]
+        };
+
+        t = topics;
+        let _topicMap:any = {
+        1:t[0],2:t[1],3:t[2],4:t[3],5:t[4],6:t[5]
+        };
+
+        t = distributions;
+        let _distributionMap:any = {
+        1:t[0],2:t[1],3:t[2],4:t[3]
+        };
+
+        t = shares;
+        let _shareMap:any = {
+        1:t[0],2:t[1],3:t[2],4:t[3]
         };
 
 
