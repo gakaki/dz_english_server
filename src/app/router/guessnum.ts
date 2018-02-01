@@ -11,6 +11,7 @@ import {Code} from "../model/code";
 import {Random} from "../../nnt/core/kernel";
 import {Aggregate, Count, Insert, Query, QueryAll, Update} from "../../nnt/manager/dbmss";
 import {DateTime} from "../../nnt/core/time";
+import {configs} from "../model/xlsconfigs";
 
 
 
@@ -29,7 +30,8 @@ export class Guessnum implements IRouter {
             return
         }
        m.userInfo=ui;
-       m.userInfo=null;
+
+       // m.userInfo=null;
 
        let psw =Guessnum.getPack();
        let pss="";
@@ -37,7 +39,11 @@ export class Guessnum implements IRouter {
            pss += i;
        }
        m.password=pss;
-        m=await Guessnum.savePack(m);
+        let pack=await Guessnum.savePack(m);
+        m.remain=pack.remain;
+        m.pid=pack.pid;
+        m.createTime=pack.createTime;
+        m.status=pack.status;
         trans.submit();
     }
 
@@ -56,7 +62,7 @@ export class Guessnum implements IRouter {
             trans.submit();
             return
         }
-
+        console.log(pack);
         let time= new Date(pack.createTime);
         console.log("创建时间");
         console.log(time);
@@ -67,13 +73,18 @@ export class Guessnum implements IRouter {
             trans.submit();
             return
         }
+
         if(pack.status != Code.PACK_Fighing){
             trans.status = pack.status;
             trans.submit();
             return
         }
 
-
+        if(pack.guessCount<=0){
+            trans.status = Code.PACK_FINSH;
+            trans.submit();
+            return
+        }
 
         if(pack.CDList){
             console.log("111111");
@@ -102,43 +113,50 @@ export class Guessnum implements IRouter {
         let result=Guessnum.guessCompare(m.guessNum,pack.password);
        let A = result.A;
        let B = result.B;
-       let probability=1;
+       let probability=0;
 
        switch (A+B){
            case 4:
+               let cfg= configs.Distribution.Get(4);
                if(pack.AAAA){
-                   probability = Random.Rangef(0.03,0.04);
+                   probability = Random.Rangef(cfg.min,cfg.max);
                }else{
-                   probability = Random.Rangef(0.08,0.1);
+                   probability = Random.Rangef(cfg.firstmin,cfg.firstmax);
                    pack.AAAA=true;
                }
                break;
            case 3:
+               let cfgAAA= configs.Distribution.Get(3);
                if(pack.AAA){
-                   probability = Random.Rangef(0.02,0.03);
+                   probability = Random.Rangef(cfgAAA.min,cfgAAA.max);
                }else{
-                   probability = Random.Rangef(0.06,0.08);
+                   probability = Random.Rangef(cfgAAA.firstmin,cfgAAA.firstmax);
                    pack.AAA=true;
                }
                break;
            case 2:
+               let cfgAA= configs.Distribution.Get(2);
                if(pack.AA){
-                   probability = Random.Rangef(0.01,0.02);
+                   probability = Random.Rangef(cfgAA.min,cfgAA.max);
                }else{
-                   probability = Random.Rangef(0.04,0.06);
+                   probability = Random.Rangef(cfgAA.firstmin,cfgAA.firstmax);
                    pack.AA=true;
                }
                break;
            case 1:
+               let cfgA= configs.Distribution.Get(1);
                if(pack.A){
-                   probability = 0.01
+                   probability = Random.Rangef(cfgAA.min,cfgAA.max);
                }else{
-                   probability = Random.Rangef(0.03,0.04);
+                   probability = Random.Rangef(cfgA.firstmin,cfgA.firstmax);
                    pack.A=true;
                }
 
        }
-        m.moneyGeted =pack.money*probability;
+        console.log("概率");
+        console.log(probability);
+
+        m.moneyGeted =Number((pack.money*probability).toFixed(2));
 
         if(A==4){
             pack.status=Code.PACK_FINSH;
@@ -149,6 +167,7 @@ export class Guessnum implements IRouter {
        m.mark=A+"A"+B+"B";
        pack.remain -= m.moneyGeted;
         pack.CDList[trans.sid] = new Date().getTime();
+        pack.guessCount -= 1;
         await Guessnum.updatePack(pack);
         console.log("结束");
         console.log(pack.CDList);
@@ -311,7 +330,7 @@ export class Guessnum implements IRouter {
             pid: DateTime.Current(),
             uid:pack.userInfo.uid,
             title:pack.title,
-          //  uid:"123",
+            //uid:"123",
             money:pack.money,
             remain:pack.money,
             password:pack.password,
@@ -329,12 +348,6 @@ export class Guessnum implements IRouter {
 
 
     protected static async getGuessNum(pid:number):Promise<PackInfo>{
-        let pack=await Query(PackInfo,{pid:pid});
-        if(pack&&pack.guessCount>0&& pack.status == Code.PACK_Fighing){
-            await Update(PackInfo,null,[{pid:pid},{$inc:{guessCount:-1}}]);
-        }else{
-            await Update(PackInfo,null,[{pid:pid},{$set:{status:Code.PACK_FINSH}}])
-        }
         return await Query(PackInfo,{pid:pid});
     }
 

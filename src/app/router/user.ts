@@ -15,7 +15,10 @@ import {UploadFile} from "../../nnt/server/imagestore";
 import {Code} from "../model/code";
 import {Config} from "../../nnt/manager/config";
 import {GEN_SID} from "../../nnt/component/account";
-import {ArrayT, IndexedObject, Instance, make_tuple, ObjectT, SyncArray, toInt, toNumber} from "../../nnt/core/kernel";
+import {
+    ArrayT, IndexedObject, Instance, make_tuple, NumberT, ObjectT, Random, SyncArray, toInt,
+    toNumber
+} from "../../nnt/core/kernel";
 import {Delta, Item, UserItemCounter} from "../model/item";
 import {logger} from "../../nnt/core/logger";
 import {UserBriefInfo, UserVipInfo} from "../model/common";
@@ -46,7 +49,6 @@ export class User implements IRouter {
     @action(LoginInfo, [frqctl])
     async login(trans: Trans) {
         let m: LoginInfo = trans.model;
-
         // 没有输入账号，而且没有找到sid
         if (!m.sid &&
             !m.uid &&
@@ -119,6 +121,8 @@ export class User implements IRouter {
         //         return;
         //     }
         // }
+
+
 
 
         // 更新其他信息
@@ -377,6 +381,12 @@ export class User implements IRouter {
     // 通过PID查找用户
     static async FindUserInfo(pid: string): Promise<UserInfo> {
         let ui = await Query(UserInfo, {pid: pid});
+        await User.PrepareInfo(ui);
+        return ui;
+    }
+
+    static async FindUserInfoByUid(uid:string):Promise<UserInfo>{
+        let ui = await Query(UserInfo, {uid: uid});
         await User.PrepareInfo(ui);
         return ui;
     }
