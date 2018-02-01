@@ -16,7 +16,7 @@
     {
       "id": "api",
       "listen": "*",
-      "port": 6000,
+      "port": 443,
       "entry": "app.server.Api",
       "imgsrv": "image",
       "mediasrv": "media",
