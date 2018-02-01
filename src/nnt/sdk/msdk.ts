@@ -1,10 +1,13 @@
 import {
-    array, file, input, integer, integer_t, json, model, optional, output, string, string_t,
+    array, double, file, input, integer, integer_t, json, model, optional, output, string, string_t,
     type
 } from "../core/proto";
 import {ArrayT, IndexedObject, MAX_INT} from "../core/kernel";
-import {colinteger, coljson, colstring, table} from "../store/proto";
+import {coldouble, colinteger, coljson, colstring, table} from "../store/proto";
 import {RestResponseData} from "../server/rest";
+import {DateTime} from "../core/time";
+import {WechatModel} from "./impl/wechat/model";
+import {Base} from "../session/model";
 
 export enum LoginMethod {
     PHONE = 0x1, // 手机登陆
@@ -324,10 +327,10 @@ export class SdkUserInfo {
     channel: string;
 
     @colstring()
-    userid: string; // 第三方平台中的唯一id(不管什么设备上登陆都是一样的）
+    userid: string; // 第三方平台中的唯一id(不管什么设备上登陆都是一样的）,微信中为openid
 
     @colstring()
-    deviceid: string; // 第三方平台当前登陆的id（不同设备上是不一样的）
+    deviceid: string; // 第三方平台当前登陆的id（不同设备上是不一样的）,微信中为unionid
 
     @colstring()
     nickname: string;
@@ -402,4 +405,32 @@ export class GetRemoteMedia {
             r.push(this.file);
         return r;
     }
+}
+
+@model()
+export class PaytoUser extends Base{
+
+    uid: string;
+
+    channel: string;
+
+    requestUrl() {
+        return '';
+    }
+}
+
+@model()
+export class Withdraw {
+    @string(1, [input], "第三方账号")
+    uid: string;
+
+    @string(2, [input], '渠道')
+    channel: string;
+
+    @double(3, [input], '提现金额/元')
+    money: number;
+
+    @json(9, [output], "客户端发起支付需要的数据")
+    @coljson()
+    payload: IndexedObject;
 }

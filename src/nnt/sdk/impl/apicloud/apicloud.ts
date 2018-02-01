@@ -1,14 +1,13 @@
 import {Channel} from "../../channel";
-import {AsyncArray, IndexedObject, Mask, toJson, toJsonObject} from "../../../core/kernel";
+import {AsyncArray, IndexedObject, Mask, toJsonObject} from "../../../core/kernel";
 import {
     Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, LoginMethod, Pay, PayMethod, SdkUserInfo, Share,
-    Support
+    Support, Withdraw
 } from "../../msdk";
 import {RegisterChannel, Sdk} from "../../sdk";
 import {Transaction} from "../../../server/transaction";
 import {Call} from "../../../manager/servers";
 import {MediaSupport} from "../../../server/mediastore";
-import {logger} from "../../../core/logger";
 
 export class Apicloud extends Channel {
 
@@ -93,6 +92,10 @@ export class Apicloud extends Channel {
                 done(t.model.path);
             })
         }))
+    }
+
+    async doWithdraw(m: Withdraw, ui: SdkUserInfo): Promise<void> {
+
     }
 }
 

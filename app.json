@@ -4,9 +4,9 @@
     "cidexpire": 600,
     "cache": "cache",
     "https": true,
-    "httpspasswd": "odao",
-    "httpskey": "config/h5.key",
-    "httpscert": "config/h5.pem",
+    "httpspasswd": "",
+    "httpskey": "config/server.key",
+    "httpscert": "config/server.pem",
     "imsrv": "im",
     "mqsrv": "amqp",
     "deskey": "231m,l/.",
@@ -104,7 +104,7 @@
     },
     {
       "id": "amqp",
-      "host": "47.96.43.62",
+      "host": "182.254.158.157",
       "user": "webapp",
       "password": "webapp",
       "entry": "nnt.server.Amqpmq",
@@ -365,16 +365,10 @@
     },
     {
       "id": "kv",
-      "repl": {
-        "name": "mgset-4921993",
-        "server": [
-          "dds-bp1d814eac81b2c41.mongodb.rds.aliyuncs.com:3717",
-          "dds-bp1d814eac81b2c42.mongodb.rds.aliyuncs.com:3717"
-        ]
-      },
+      "host": "172.17.16.3:27017",
       "scheme": "wxsrv",
       "user": "wxsrv",
-      "password": "wxsrv",
+      "password": "wxsrvh5group",
       "entry": "nnt.store.KvMongo",
       "enable": "release"
     },
@@ -389,16 +383,10 @@
     },
     {
       "id": "ss",
-      "repl": {
-        "name": "mgset-4921993",
-        "server": [
-          "dds-bp1d814eac81b2c41.mongodb.rds.aliyuncs.com:3717",
-          "dds-bp1d814eac81b2c42.mongodb.rds.aliyuncs.com:3717"
-        ]
-      },
+      "host": "172.17.16.3:27017",
       "scheme": "wxstatis",
       "user": "wxsrv",
-      "password": "wxsrv",
+      "password": "wxsrvh5group",
       "entry": "nnt.store.KvMongo",
       "enable": "release"
     },
@@ -413,7 +401,7 @@
     },
     {
       "id": "rd",
-      "host": "r-bp12f4e25af50854.redis.rds.aliyuncs.com",
+      "host": "127.0.0.1",
       "cluster": false,
       "dbid": 0,
       "password": "Douzihuyu2018",

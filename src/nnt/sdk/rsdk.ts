@@ -1,7 +1,7 @@
 import {action, IRouter} from "../core/router";
 import {
     Auth, CheckExpire, CompletePay, Environment, GetRemoteMedia, Info, Login, LoginMethod, Pay, PayMethod,
-    SdkPayOrderId, SdkUserInfo, Share, ShareMethod, Support
+    SdkPayOrderId, SdkUserInfo, Share, ShareMethod, Support, Withdraw
 } from "./msdk";
 import {Sdk} from "./sdk";
 import {Transaction} from "../server/transaction";
@@ -305,6 +305,35 @@ export class RSdk implements IRouter {
         }
 
         await chann.doRemoteAudios(m, rcd);
+
+        trans.submit();
+    }
+
+    @action(Withdraw, [], "付款给用户")
+    async withdraw(trans: Transaction) {
+        let m: Withdraw = trans.model;
+
+        let rcd: SdkUserInfo;
+        if (m.uid) {
+            rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), m.uid);
+            if (!rcd) {
+                trans.status = STATUS.TARGET_NOT_FOUND;
+                trans.submit();
+                return;
+            }
+        }
+
+        trans.timeout(20);
+
+        let chann = this._sdk.channel(m.channel);
+        if (!chann) {
+            logger.warn("sdk: 没有找到channel " + m.channel);
+            trans.status = STATUS.TARGET_NOT_FOUND;
+            trans.submit();
+            return;
+        }
+
+        await chann.doWithdraw(m, rcd);
 
         trans.submit();
     }

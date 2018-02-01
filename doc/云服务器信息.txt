@@ -1,0 +1,45 @@
+mq:
+
+Topic:h5_1
+
+Producer ID:PID_H5_1
+http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet
+
+Consumer ID:CID_H5_1
+http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet
+
+
+redis:
+
+�˺�:r-bp12f4e25af50854
+
+����:Douzihuyu2018
+
+
+mongo��Ⱥ��
+dds-bp1d814eac81b2c41.mongodb.rds.aliyuncs.com:3717
+dds-bp1d814eac81b2c42.mongodb.rds.aliyuncs.com:3717
+root
+���� mandao#douzihuyu@2018
+
+aliyunNew��������
+47.96.43.62
+56666
+odao
+mandao#douzihuyu@2018
+
+--------------------以上是旧的服务器，已过期-------------------
+--------------------下面是新的---------------------------------
+
+云服务器：182.254.158.157:56666
+root
+mandao#douzihuyu@2018
+该服务器上本地布置了redis\rabbitmq
+mongodb是腾讯云账号下另外购置的
+地址：172.17.16.3:27017
+密码：Douzi#Xx@2017
+mongodb只能从云服务器上内网访问，我们公司的机器无法连接。管理它需要登录腾讯云
+
+
+腾讯云上（包括云服务器、mongodb服务器）
+腾讯云账号（QQ登录）：2053432774 密码：DOUzihuyu123456

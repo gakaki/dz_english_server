@@ -1,6 +1,9 @@
 import {IndexedObject} from "../core/kernel";
 import {Sdk} from "./sdk";
-import {Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, SdkUserInfo, Share, Support} from "./msdk";
+import {
+    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, PaytoUser, SdkUserInfo, Share,
+    Support, Withdraw
+} from "./msdk";
 import {Transaction} from "../server/transaction";
 
 export abstract class Channel {
@@ -45,6 +48,9 @@ export abstract class Channel {
 
     // 服务端获取远端语音
     abstract doRemoteAudios(m: GetRemoteMedia, ui?: SdkUserInfo): Promise<void>;
+
+    //提现（从豆子账号通过企业付款给用户）
+    abstract doWithdraw(m: Withdraw, ui?: SdkUserInfo): Promise<void>;
 
     protected _sdk: Sdk;
 }

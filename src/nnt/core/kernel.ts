@@ -1,4 +1,5 @@
 import fs = require("fs");
+import os = require('os');
 import dotpl = require("dot");
 import async = require("async");
 import {logger} from "./logger";
@@ -2143,4 +2144,16 @@ class _AsyncArray<T> {
     }
 
     private _arr: T[];
+}
+
+let _server_ip:string;
+export function getServerIp(): string {
+    if (!_server_ip) {
+        //see https://nodejs.org/api/os.html#os_os_networkinterfaces
+        let infos:Array<IndexedObject> = os.networkInterfaces().eth0;
+        _server_ip = infos.find( info => {
+            return info.family == 'IPv4'
+        }).address;
+    }
+    return _server_ip;
 }

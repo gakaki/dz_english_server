@@ -5,7 +5,7 @@ import {UserInfo} from "../model/user";
 import {User} from "./user";
 import {Code} from "../model/code";
 import {Random} from "../../nnt/core/kernel";
-import {Insert} from "../../nnt/manager/dbmss";
+import {Aggregate, Insert} from "../../nnt/manager/dbmss";
 import {DateTime} from "../../nnt/core/time";
 import {colarray, coldouble, colinteger, colstring, coltype} from "../../nnt/store/proto";
 import {double, integer, string, type} from "../../nnt/core/proto";

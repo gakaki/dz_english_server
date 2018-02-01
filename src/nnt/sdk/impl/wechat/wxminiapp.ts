@@ -2,12 +2,12 @@ import url = require("url");
 import {Channel} from "../../channel";
 import {RegisterChannel, Sdk} from "../../sdk";
 import {
-    AsyncArray, IndexedObject, make_tuple, ObjectT, Random, StringT, toJson,
+    AsyncArray, getServerIp, IndexedObject, make_tuple, ObjectT, StringT, toJson,
     toJsonObject
 } from "../../../core/kernel";
 import {
-    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, LoginMethod, Pay, PayMethod, SdkUserInfo, Share,
-    Support
+    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, PayMethod, SdkUserInfo, Share, Support,
+    Withdraw
 } from "../../msdk";
 import {Fast} from "../../../component/encode";
 import {AuthType, WechatRefreshToken, WechatToken, WechatUserProfile, WxminiappToken} from "./model";
@@ -19,7 +19,7 @@ import {Call} from "../../../manager/servers";
 import {NonceAlDig} from "../../../component/nonce";
 import {Format, StringDigest} from "../../../core/string";
 import {Transaction} from "../../../server/transaction";
-import {WechatPayResult, WechatUnifiedOrder} from "./paymodel";
+import {WechatPayResult, WechatUnifiedOrder, WxappPaytoUser} from "./paymodel";
 import {Decode, Encode, Output as ApiOutput} from "../../../core/proto";
 import {STATUS} from "../../../core/models";
 import {logger} from "../../../core/logger";
@@ -37,6 +37,7 @@ export class WxMiniApp extends Channel {
         if (!c.appid ||
             !c.appsecret)
             return false;
+
         this.appid = c.appid;
         this.appsecret = c.appsecret;
         this.pubid = c.pubid;
@@ -176,10 +177,10 @@ export class WxMiniApp extends Channel {
                 // 插入到数据库中
                 let r = await Update(make_tuple(this._sdk.dbsrv, SdkUserInfo), null, [
                     // 从openid修改成unionid
-                    {oid: lg.unionid},
-                    {$set: {info: {}}},
+                    {userid: lg.openid},
+                    {$set: {deviceid: lg.unionid}},
                     {upsert: true}]);
-                m.uid = GetInnerId(r);
+                m.uid =lg.openid;//直接使用openid
                 return true;
             }
             // 否则走重新授权的流程
@@ -474,6 +475,52 @@ export class WxMiniApp extends Channel {
         return true;
     }
 
+    genWithdrawTradeNO(uid:string): string {
+        return `withdraw_${uid}_${DateTime.Current()}`
+    }
+
+    async doWithdraw(m: Withdraw, ui: SdkUserInfo): Promise<void> {
+        let wtd: WxappPaytoUser = new WxappPaytoUser();
+        wtd.nonce_str = NonceAlDig(10);
+
+        //sign
+        wtd.out_trade_no = this.genWithdrawTradeNO(m.uid);
+        wtd.money = m.money; // 正式的价格
+        wtd.srv_ip = getServerIp();
+        wtd.appid = this.appid;
+        wtd.mch_id = this.pubmchid;
+        wtd.signkey = this.pubkey;
+        wtd.openid = ui.userid;
+
+        // 计算签名
+        let fields = ObjectT.ToMap(Encode(wtd));
+        wtd.sign = this.doSignaturePay(fields, wtd.signkey);
+        wtd.created = DateTime.Now();
+
+        let res = await RestSession.Get(wtd);
+        if (!res) {
+            wtd.success = false;
+            logger.warn('企业支付到零钱出错,请求params为{{=it.url}}', {url: wtd.requestParams()});
+            Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(wtd));
+            return ;
+        }
+
+        //组装返回的数据
+        // m.payload = {
+        //     appId: this.pubid,
+        //     timeStamp: DateTime.Current().toString(),
+        //     nonceStr: NonceAlDig(10),
+        //     package: "prepay_id=" + res.prepay_id,
+        //     signType: "MD5"
+        // };
+        // fields = ObjectT.ToMap(m.payload);
+        // m.payload.paySign = this.doSignaturePay(fields, wtd.signkey);
+
+        // 保存纪录
+        res.success = true;
+        Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(res));
+    }
+
     protected doSignaturePay(fields: Map<string, any>, key: string): string {
         let argus = new Array();
         fields.forEach((v, k) => {
@@ -598,6 +645,8 @@ export class WxMiniApp extends Channel {
             });
         }));
     }
+
+
 }
 
 RegisterChannel("wxminiapp", WxMiniApp);

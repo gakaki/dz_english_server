@@ -2,7 +2,7 @@ import {Channel} from "../../channel";
 import {AsyncArray, IndexedObject, Mask} from "../../../core/kernel";
 import {
     Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, LoginMethod, Pay, PayMethod, SdkUserInfo, Share,
-    Support
+    Support, Withdraw
 } from "../../msdk";
 import {RegisterChannel, Sdk} from "../../sdk";
 import {Transaction} from "../../../server/transaction";
@@ -71,6 +71,10 @@ export class Common extends Channel {
     }
 
     async doRemoteAudios(m: GetRemoteMedia, ui: SdkUserInfo): Promise<void> {
+
+    }
+
+    async doWithdraw(m: Withdraw, ui: SdkUserInfo): Promise<void> {
 
     }
 }

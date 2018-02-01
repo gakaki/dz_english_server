@@ -1,15 +1,15 @@
 import {Channel} from "../../channel";
 import {IndexedObject, make_tuple} from "../../../core/kernel";
 import {
-    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, SdkUserInfo, Share,
-    Support
+    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, SdkUserInfo, Share, Support,
+    Withdraw
 } from "../../msdk";
 import {RegisterChannel, Sdk} from "../../sdk";
 import {Transaction} from "../../../server/transaction";
 import {IapReceiptValidate} from "./model";
 import {Decode} from "../../../core/proto";
 import {Insert, Query} from "../../../manager/dbmss";
-import {colboolean, Output} from "../../../store/proto";
+import {Output} from "../../../store/proto";
 import {logger} from "../../../core/logger";
 import {RestSession} from "../../../session/rest";
 import {static_cast} from "../../../core/core";
@@ -103,6 +103,10 @@ export class Apple extends Channel {
     }
 
     async doRemoteAudios(m: GetRemoteMedia, ui: SdkUserInfo): Promise<void> {
+
+    }
+
+    async doWithdraw(m: Withdraw, ui: SdkUserInfo): Promise<void> {
 
     }
 }

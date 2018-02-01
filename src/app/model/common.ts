@@ -89,7 +89,7 @@ export class UserBriefInfo {
 
     @string(2, [input, output], "如果是第三方登陆，则返回UID")
     @colstring()
-    uid: string; // 第三方登陆的id
+    uid: string; // 第三方登陆的id, 对小微信小程序，就是用户在微信的openid
 
     @string(1, [input, output], '用户名')
     @colstring()

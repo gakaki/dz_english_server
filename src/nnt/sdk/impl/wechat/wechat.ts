@@ -7,7 +7,7 @@ import {
 } from "../../../core/kernel";
 import {
     Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, LoginMethod, Pay, PayMethod, SdkUserInfo, Share,
-    Support
+    Support, Withdraw
 } from "../../msdk";
 import {Fast} from "../../../component/encode";
 import {AuthType, WechatRefreshToken, WechatToken, WechatUserProfile} from "./model";
@@ -653,6 +653,10 @@ export class Wechat extends Channel {
                 done(t.model.path);
             });
         }));
+    }
+
+    async doWithdraw(m: Withdraw, ui: SdkUserInfo): Promise<void> {
+
     }
 }
 

@@ -1,9 +1,13 @@
 // 微信登陆方式
-import {array, input, integer, json, model, optional, output, string, string_t, type} from "../../../core/proto";
+import {
+    array, double, input, integer, json, model, optional, output, string, string_t,
+    type
+} from "../../../core/proto";
 import {Base, IResponseData, RequestParams} from "../../../session/model";
 import {logger} from "../../../core/logger";
-import {colarray, colinteger, colstring, table} from "../../../store/proto";
-import {SdkUserInfo, Support} from "../../msdk";
+import {colarray, coldouble, colinteger, colstring, table} from "../../../store/proto";
+import {PaytoUser, SdkUserInfo, Support} from "../../msdk";
+import {DateTime} from "../../../core/time";
 
 export enum AuthType {
     PUB = 1, // 公众号授权
@@ -211,6 +215,7 @@ export class WxminiappToken extends WechatModel {
     unionid: string;
 
 }
+
 
 // 刷新token
 @model()
