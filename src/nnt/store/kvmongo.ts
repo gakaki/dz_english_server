@@ -99,8 +99,8 @@ export class KvMongo extends AbstractNosql {
             let opts: IndexedObject = {};
             if (this.user) {
                 opts.auth = {
-                    user: this.user,
-                    password: this.password
+                    user: encodeURIComponent(this.user),
+                    password: encodeURIComponent(this.password)
                 }
             }
             this._db = await this._hdl.connect(url, opts);
