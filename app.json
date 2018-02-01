@@ -365,7 +365,7 @@
     },
     {
       "id": "kv",
-      "host": "172.17.16.3:27017",
+      "host": "mongodb://wxsrv:wxsrvh5group@172.17.16.3:27017/admin",
       "scheme": "wxsrv",
       "user": "wxsrv",
       "password": "wxsrvh5group",
@@ -383,7 +383,7 @@
     },
     {
       "id": "ss",
-      "host": "172.17.16.3:27017",
+      "host": "mongodb://wxsrv:wxsrvh5group@172.17.16.3:27017/admin",
       "scheme": "wxstatis",
       "user": "wxsrv",
       "password": "wxsrvh5group",
