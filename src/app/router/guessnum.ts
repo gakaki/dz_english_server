@@ -1,15 +1,17 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
-import {ClearCD, Guess, PackGuessRecord, PackInfo, PackRecords} from "../model/guessnum";
+import {
+    ClearCD, GetPack, Guess, PackGuessRecord, PackInfo, PackRankingList, PackRecords, RankInfo, ReceivePackage,
+    SendPackage,
+    UserPackRecord,
+} from "../model/guessnum";
 import {Trans} from "../../contrib/manager/trans";
 import {UserInfo} from "../model/user";
 import {User} from "./user";
 import {Code} from "../model/code";
 import {Random} from "../../nnt/core/kernel";
-import {Insert, Query, QueryAll, Update} from "../../nnt/manager/dbmss";
+import {Aggregate, Count, Insert, Query, QueryAll, Update} from "../../nnt/manager/dbmss";
 import {DateTime} from "../../nnt/core/time";
-import {colarray, coldouble, colinteger, colstring, coltype} from "../../nnt/store/proto";
-import {double, integer, string, type} from "../../nnt/core/proto";
-import uuid = require("uuid");
+
 
 
 
@@ -27,7 +29,8 @@ export class Guessnum implements IRouter {
             return
         }
        m.userInfo=ui;
-       //m.userInfo=null;
+       m.userInfo=null;
+
        let psw =Guessnum.getPack();
        let pss="";
        for(let i of psw){
@@ -41,27 +44,37 @@ export class Guessnum implements IRouter {
     @action(Guess)
     async guesspack(trans:Trans){
         let m:Guess=trans.model;
+        let ui:UserInfo=await User.FindUserBySid(trans.sid);
+        if(ui==null){
+            trans.status = Code.USER_NOT_FOUND;
+            trans.submit();
+            return
+        }
         let pack=await Guessnum.getGuessNum(m.pid);
         if(pack == null){
             trans.status = Code.PACK_EMPTY;
             trans.submit();
             return
         }
-      /*  let ui:UserInfo=await User.FindUserBySid(trans.sid);
-        if(ui==null){
-            trans.status = Code.USER_NOT_FOUND;
+
+        let time= new Date(pack.createTime);
+        console.log("创建时间");
+        console.log(time);
+        if(time.getTime() +24*60*60*1000 <= new Date().getTime()){
+            console.log(new Date().getTime());
+            trans.status = Code.PACK_EXPIRED;
+            await Guessnum.updatePackStatus(pack.pid,Code.PACK_EXPIRED);
             trans.submit();
             return
-        }*/
+        }
         if(pack.status != Code.PACK_Fighing){
             trans.status = pack.status;
             trans.submit();
             return
         }
 
-       console.log("进来");
-        console.log(pack.CDList);
-        console.log(pack.CDList.length);
+
+
         if(pack.CDList){
             console.log("111111");
         }
@@ -90,9 +103,7 @@ export class Guessnum implements IRouter {
        let A = result.A;
        let B = result.B;
        let probability=1;
-       if(A==4){
-           pack.status=Code.PACK_FINSH;
-       }
+
        switch (A+B){
            case 4:
                if(pack.AAAA){
@@ -128,13 +139,20 @@ export class Guessnum implements IRouter {
 
        }
         m.moneyGeted =pack.money*probability;
+
+        if(A==4){
+            pack.status=Code.PACK_FINSH;
+            m.moneyGeted=pack.remain;
+        }
+
+
        m.mark=A+"A"+B+"B";
        pack.remain -= m.moneyGeted;
         pack.CDList[trans.sid] = new Date().getTime();
         await Guessnum.updatePack(pack);
         console.log("结束");
         console.log(pack.CDList);
-        await Guessnum.saveUserGuessRecord("123",m.guessNum,m.moneyGeted,m.mark,m.pid);
+        await Guessnum.saveUserGuessRecord(ui.uid,m.guessNum,m.moneyGeted,m.mark,m.pid);
         trans.submit();
     }
 
@@ -142,12 +160,12 @@ export class Guessnum implements IRouter {
     async clearcd(trans:Trans){
         console.log("没有进来？");
         let m:ClearCD = trans.model;
-        /*let ui:UserInfo=await User.FindUserBySid(trans.sid);
+        let ui:UserInfo=await User.FindUserBySid(trans.sid);
         if(ui==null){
             trans.status = Code.USER_NOT_FOUND;
             trans.submit();
             return
-        }*/
+        }
         let pack=await Guessnum.getGuessPack(m.pid);
         if(pack == null){
             trans.status = Code.PACK_EMPTY;
@@ -179,18 +197,19 @@ export class Guessnum implements IRouter {
     @action(PackRecords)
     async getpackrecords(trans:Trans){
         let m:PackRecords=trans.model;
+        let ui:UserInfo=await User.FindUserBySid(trans.sid);
+        if(ui==null){
+            trans.status = Code.USER_NOT_FOUND;
+            trans.submit();
+            return
+        }
         let pack=await Guessnum.getGuessPack(m.pid);
         if(pack == null){
             trans.status = Code.PACK_EMPTY;
             trans.submit();
             return
         }
-       /*   let ui:UserInfo=await User.FindUserBySid(trans.sid);
-       if(ui==null){
-           trans.status = Code.USER_NOT_FOUND;
-           trans.submit();
-           return
-       }*/
+
         m.packPassword=pack.password;
         m.packInfo={
             totalMoney:pack.money,
@@ -204,6 +223,52 @@ export class Guessnum implements IRouter {
         trans.submit();
 
     }
+    @action(PackRankingList)
+    async getpackrankinglist(trans:Trans){
+        let m:PackRankingList=trans.model;
+        let pack=await Guessnum.getGuessPack(m.pid);
+        if(pack == null){
+            trans.status = Code.PACK_EMPTY;
+            trans.submit();
+            return
+        }
+        pack.userInfo=await User.FindUserInfoByUid(pack.uid);
+        m.packInfo=pack;
+        let result=await Guessnum.getPackRankingList(m.pid);
+        //console.log(result);
+
+        m.rank=result;
+       // console.log(m);
+        trans.submit()
+    }
+
+    @action(UserPackRecord)
+    async getuserpackrecords(trans:Trans){
+        let m:UserPackRecord = trans.model;
+           let ui:UserInfo=await User.FindUserBySid(trans.sid);
+       if(ui==null){
+           trans.status = Code.USER_NOT_FOUND;
+           trans.submit();
+           return
+       }
+       let sendPackage:SendPackage = new SendPackage();
+       let receivePackage:ReceivePackage = new ReceivePackage();
+
+       let p= await Guessnum.getPackSumByUid(ui.uid);
+        sendPackage.sum=p.sum;
+       sendPackage.num=await Guessnum.getPackCountByUid(ui.uid);
+       sendPackage.record=await Guessnum.getPacksByUid(ui.uid);
+
+       let r =await Guessnum.getReceivePackageRecordsMoneyByUid(ui.uid);
+       receivePackage.sum=r.moneyGot;
+       receivePackage.num=await Guessnum.getReceivePackageRecordsCountByUid(ui.uid);
+       receivePackage.record=await Guessnum.getReceivePackageRecordsByUid(ui.uid);
+
+        m.sendPackages=sendPackage;
+        m.receivePackages=receivePackage;
+        console.log(m);
+        trans.submit()
+}
 
     protected static getPack(){
         let psw=new Set();
@@ -244,6 +309,9 @@ export class Guessnum implements IRouter {
     protected static async savePack(pack:PackInfo):Promise<PackInfo>{
         return await Insert(PackInfo, {
             pid: DateTime.Current(),
+            uid:pack.userInfo.uid,
+            title:pack.title,
+          //  uid:"123",
             money:pack.money,
             remain:pack.money,
             password:pack.password,
@@ -276,6 +344,26 @@ export class Guessnum implements IRouter {
     protected static async updatePack(pack:PackInfo){
         await Update(PackInfo,null,[{pid:pack.pid},pack])
     }
+    protected static async updatePackStatus(pid:number,status:number){
+        await Update(PackInfo,null,[{pid:pid},{$set:{status:status}}])
+    }
+
+
+    protected static async getPacksByUid(uid:string){
+        return await QueryAll(PackInfo,{uid:uid});
+    }
+    protected static async getPackCountByUid(uid:string){
+        return await Count(PackInfo,{uid:uid});
+    }
+    protected static async getPackSumByUid(uid:string){
+        let r = await Aggregate<PackInfo>(PackInfo, {
+            $match: {uid: uid,},
+            $group:{_id:"$uid",sum:{$sum:"$money"}},
+            $limit:1,
+        });
+        console.log(r);
+        return  r[0]
+    }
 
     protected static async saveUserGuessRecord(uid:string,userAnswerWord:string,userGetMoney:number,userMark:string,pid:number){
         await Insert(PackGuessRecord,{
@@ -288,7 +376,62 @@ export class Guessnum implements IRouter {
     }
 
     protected static async getPackGuessRecords(pid:number){
-        return await QueryAll(PackGuessRecord,{pid:pid});
+        let records:PackGuessRecord []= await QueryAll(PackGuessRecord,{pid:pid});
+        for(let record of records){
+            record.userInfo = await User.FindUserInfoByUid(record.uid);
+        }
+        return records;
     }
+
+    protected static async getPackRankingList(pid:number){
+        let r = await Aggregate<PackGuessRecord>(PackGuessRecord, {
+            $match: {pid: pid,},
+            $group:{_id:"$uid",moneyGot:{$sum:"$userGetMoney"}},
+            $sort:{moneyGot: -1},
+        });
+        console.log(r);
+        let rankInfos :RankInfo[] = [];
+        for(let record of r){
+            let rankInfo:RankInfo = new RankInfo();
+            console.log(record._id);
+            rankInfo.uid=record._id;
+            rankInfo.userInfo=await User.FindUserInfoByUid(record._id);
+            rankInfo.moneyGot=record.moneyGot;
+            rankInfo.guessRecords=await QueryAll(PackGuessRecord,{pid:pid,uid:record._id});
+            rankInfos.push(rankInfo);
+        }
+
+        return rankInfos;
+    }
+
+    protected static async getReceivePackageRecordsCountByUid(uid:string){
+        return await Count(PackGuessRecord,{uid:uid});
+    }
+    protected static async getReceivePackageRecordsByUid(uid:string){
+        let ps= await QueryAll(PackGuessRecord,{uid:uid});
+        let getPacks:GetPack[]=[];
+        for(let p of ps){
+            let getPack:GetPack = new GetPack();
+           let pack=await Guessnum.getGuessPack(p.pid);
+            getPack.userInfo=await User.FindUserInfoByUid(pack.uid);
+            getPack.moneyGot = p.userGetMoney;
+            getPacks.push(getPack);
+        }
+        console.log("总记录");
+        console.log(getPacks);
+        return getPacks
+    }
+
+    protected static async getReceivePackageRecordsMoneyByUid(uid:string){
+        let r = await Aggregate<PackGuessRecord>(PackGuessRecord, {
+            $match: {uid: uid,},
+            $group:{_id:"$uid",moneyGot:{$sum:"$userGetMoney"}},
+            $limit:1,
+        });
+        console.log("获取的总金额");
+        console.log(r);
+        return r[0];
+    }
+
 
 }
