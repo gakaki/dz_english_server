@@ -1,8 +1,8 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
 import {
-    ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, PictureInfo, QueryUser, QueryUserVipInfo, UserActionRecord,
-    UserActionRecordType, UserInfo, UserPicture, UserPictures, UserShare, UserShareCounter, UserShareDailyCounter,
-    UserSid, UserTili, UserType, UserVipGiftCounter
+    AuthInfo, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, PictureInfo, QueryUser, QueryUserVipInfo,
+    UserActionRecord, UserActionRecordType, UserInfo, UserPicture, UserPictures, UserShare, UserShareCounter,
+    UserShareDailyCounter, UserSid, UserTili, UserType, UserVipGiftCounter
 } from "../model/user";
 import {AutoInc, Delete, Get, Insert, Iterate, Query, QueryAll, Set, Update} from "../../nnt/manager/dbmss";
 import {GetInnerId, Output} from "../../nnt/store/proto";
@@ -15,16 +15,13 @@ import {UploadFile} from "../../nnt/server/imagestore";
 import {Code} from "../model/code";
 import {Config} from "../../nnt/manager/config";
 import {GEN_SID} from "../../nnt/component/account";
-import {
-    ArrayT, IndexedObject, Instance, make_tuple, NumberT, ObjectT, Random, SyncArray, toInt,
-    toNumber
-} from "../../nnt/core/kernel";
+import {IndexedObject, Instance, make_tuple, ObjectT, SyncArray, toNumber} from "../../nnt/core/kernel";
 import {Delta, Item, UserItemCounter} from "../model/item";
 import {logger} from "../../nnt/core/logger";
 import {UserBriefInfo, UserVipInfo} from "../model/common";
 import {IApiServer} from "../../nnt/server/apiserver";
 import {AbstractCronTask, CronAdd, PerDay} from "../../nnt/manager/crons";
-import {SdkUserInfo} from "../../nnt/sdk/msdk";
+import {Auth, SdkUserInfo} from "../../nnt/sdk/msdk";
 import {REGEX_PHONE} from "../../nnt/component/pattern";
 import {configs} from "../model/xlsconfigs";
 
@@ -44,6 +41,26 @@ export class User implements IRouter {
     static CheckPassword(str: string): boolean {
         let pat = new RegExp(configs.Parameter.Get("user.passwordpattern").value);
         return str.match(pat) != null;
+    }
+
+    @action(AuthInfo)
+    async auth(trans: Trans) {
+        let m: AuthInfo = trans.model;
+        let sdkAuth = new Auth();
+        sdkAuth.payload = m.payload;
+        sdkAuth.channel = 'wxminiapp';
+
+        let r = Call('sdk', 'sdk.auth', sdkAuth);
+
+        if (r) {
+            m.uid = sdkAuth.uid;
+        }
+        else {
+            trans.status = Code.VERIFY_FAILED;
+        }
+
+        trans.submit();
+        
     }
 
     @action(LoginInfo, [frqctl])

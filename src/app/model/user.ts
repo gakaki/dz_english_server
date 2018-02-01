@@ -1,5 +1,5 @@
 import {
-    array, auth, boolean, enumm, file, FileType, input, integer, model, optional, output, string, string_t,
+    array, auth, boolean, enumm, file, FileType, input, integer, json, model, optional, output, string, string_t,
     type
 } from "../../nnt/core/proto";
 import {colarray, colboolean, colinteger, coljson, colstring, coltype, table} from "../../nnt/store/proto";
@@ -8,12 +8,22 @@ import {DateTime} from "../../nnt/core/time";
 import {UserBriefInfo, UserVipInfo} from "./common";
 import {Check} from "../../nnt/component/maskword";
 import {configs} from "./xlsconfigs";
+import {IndexedObject} from "../../nnt/core/kernel";
 
 @model([auth])
 export class QueryUserVipInfo {
 
     @array(2, UserVipInfo, [output])
     items: UserVipInfo[];
+}
+
+@model()
+export class AuthInfo {
+    @json(4, [input, optional], "info中拿到的数据")
+    payload: IndexedObject;
+
+    @string(2, [output])
+    uid: string;
 }
 
 @model([auth], UserBriefInfo)
