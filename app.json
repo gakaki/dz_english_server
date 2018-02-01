@@ -365,8 +365,8 @@
     },
     {
       "id": "kv",
-      "host": "10.66.161.177:27017/wxsrv?authSource=admin",
-      "scheme": "wxsrv",
+      "host": "172.17.16.3:27017/wxsrv?authSource=admin",
+      "scheme": "",
       "user": "mongouser",
       "password": "Douzi#Xx@2017",
       "entry": "nnt.store.KvMongo",
@@ -383,7 +383,7 @@
     },
     {
       "id": "ss",
-      "host": "10.66.161.177:27017/wxsrv?authSource=admin",
+      "host": "172.17.16.3:27017/wxsrv?authSource=admin",
       "scheme": "",
       "user": "mongouser",
       "password": "Douzi#Xx@2017",

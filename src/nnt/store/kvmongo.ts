@@ -94,7 +94,8 @@ export class KvMongo extends AbstractNosql {
     }
 
     protected async doOpenAlone() {
-        let url = "mongodb://" + this.host + "/" + this.scheme;
+        // let url = "mongodb://" + this.host + "/" + this.scheme;
+        let url = "mongodb://" + this.host// + "/" + this.scheme;
         try {
             let opts: IndexedObject = {};
             if (this.user) {
