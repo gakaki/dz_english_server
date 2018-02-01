@@ -365,10 +365,10 @@
     },
     {
       "id": "kv",
-      "host": "wxsrv:wxsrvh5group@172.17.16.3:27017/admin",
+      "host": "10.66.161.177:27017/wxsrv?authSource=admin",
       "scheme": "wxsrv",
-      "user": "wxsrv",
-      "password": "wxsrvh5group",
+      "user": "mongouser",
+      "password": "Douzi#Xx@2017",
       "entry": "nnt.store.KvMongo",
       "enable": "release"
     },
@@ -383,10 +383,10 @@
     },
     {
       "id": "ss",
-      "host": "wxsrv:wxsrvh5group@172.17.16.3:27017",
-      "scheme": "wxstatis",
-      "user": "wxsrv",
-      "password": "wxsrvh5group",
+      "host": "10.66.161.177:27017/wxsrv?authSource=admin",
+      "scheme": "",
+      "user": "mongouser",
+      "password": "Douzi#Xx@2017",
       "entry": "nnt.store.KvMongo",
       "enable": "release"
     },
