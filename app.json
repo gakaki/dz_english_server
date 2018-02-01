@@ -60,7 +60,7 @@
       "listen": "*",
       "port": 6001,
       "entry": "nnt.server.ImageStore",
-      "store": "../../uploads",
+      "store": "../uploads",
       "enable": "release"
     },
     {
