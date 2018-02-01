@@ -5,7 +5,7 @@ import {DbExecuteStat, IterateCursorProcess} from "./store";
 import {IndexedObject, ObjectT, toJson} from "../core/kernel";
 import {Variant} from "../core/object";
 import {static_cast} from "../core/core";
-import {IsDebug} from "../manager/config";
+import {Config, IsDebug} from "../manager/config";
 import mongo = require("mongodb");
 
 let DEFAULT_PORT = 27017;
@@ -94,15 +94,21 @@ export class KvMongo extends AbstractNosql {
     }
 
     protected async doOpenAlone() {
-        let url = "mongodb://" + this.host + "/" + this.scheme;
-        try {
-            let opts: IndexedObject = {};
+        let url:string;
+        let opts:IndexedObject = {};
+        if (IsDebug()) {
+            url = "mongodb://" + this.host + "/" + this.scheme;
             if (this.user) {
                 opts.auth = {
                     user: encodeURIComponent(this.user),
                     password: encodeURIComponent(this.password)
                 }
             }
+        }
+        else {
+            url = "mongodb://" + encodeURIComponent(this.user) + ":" + encodeURIComponent(this.password) + "@" + this.host;
+        }
+        try {
             this._db = await this._hdl.connect(url, opts);
             logger.info("连接 {{=it.id}}@mongo", {id: this.id});
         }
