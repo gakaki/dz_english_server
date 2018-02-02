@@ -3,7 +3,7 @@
     "sidexpire": 86400,
     "cidexpire": 600,
     "cache": "cache",
-    "https": true,
+    "https": false,
     "httpspasswd": "",
     "httpskey": "config/server.key",
     "httpscert": "config/server.pem",
@@ -16,7 +16,7 @@
     {
       "id": "api",
       "listen": "*",
-      "port": 443,
+      "port": 6000,
       "entry": "app.server.Api",
       "imgsrv": "image",
       "mediasrv": "media",
@@ -196,7 +196,7 @@
           "payid": "wxfc983573261a5210",
           "paykey": "shanghaidouziwangluokejigongsih5",
           "paymchid": "1494209122",
-          "noticeurl": "https://h5.douzi.com:6000/action/shop.done"
+          "noticeurl": "https://h5.ddz2018.com/action/shop.done"
         },
         {
           "id": "wxminiapp",
@@ -209,7 +209,7 @@
           "payid": "wxfc983573261a5210",
           "paykey": "shanghaidouziwangluokejigongsih5",
           "paymchid": "1494209122",
-          "noticeurl": "https://h5.douzi.com:6000/action/shop.done"
+          "noticeurl": "https://h5.ddz2018.com/action/shop.done"
         }
       ]
     },
@@ -220,8 +220,8 @@
       "root": "~/src/contrib/apidoc/apidoc/",
       "entry": "contrib.apidoc.ApiDoc",
       "enable": "develop",
-      "host": "api.h5group.com:6000",
-      "wshost": "api.h5group.com:6003"
+      "host": "localhost:6000",
+      "wshost": "localhost:6003"
     },
     {
       "id": "apidoc",
@@ -240,8 +240,8 @@
       "root": "~/src/contrib/apidoc/apidoc/",
       "entry": "contrib.apidoc.ApiDoc",
       "enable": "release",
-      "host": "h5.douzi.com:6000",
-      "wshost": "h5.douzi.com:6003"
+      "host": "h5.ddz2018.com:6000",
+      "wshost": "h5.ddz2018.com:6003"
     },
     {
       "id": "manager-api",
@@ -346,7 +346,7 @@
       "index": "main.js",
       "root": "~/src/contrib/manager/portal",
       "entry": "contrib.manager.Portal",
-      "host": "h5.douzi.com:5002",
+      "host": "h5.ddz2018.com:5002",
       "enable": "release"
     }
   ],
