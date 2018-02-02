@@ -92,13 +92,13 @@ export class Sms {
 @model()
 export class LoginInfo {
 
-    @type(3, UserInfo, [input], "用户信息")
+    @type(3, UserInfo, [input,output], "用户信息")
     info: UserInfo;
 
     @string(4, [output])
     sid: string;
 
-    @string(5, [input, optional], "第三方登陆的id")
+    @string(5, [input,output, optional], "第三方登陆的id")
     uid: string;
 
     @string(9, [output], "平台号")
