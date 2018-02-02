@@ -384,7 +384,8 @@ export class Guessnum implements IRouter {
             pid:pid,
             userAnswerWord:userAnswerWord,
             userGetMoney:userGetMoney,
-            userMark:userMark
+            userMark:userMark,
+            createTime:new Date().toLocaleString()
         })
     }
 

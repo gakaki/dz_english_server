@@ -119,6 +119,9 @@ export class PackGuessRecord{
     @colstring()
     userMark:string;
 
+   @colstring()
+   createTime:string;
+
 }
 
 
