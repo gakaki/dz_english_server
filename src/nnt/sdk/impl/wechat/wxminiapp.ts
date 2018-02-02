@@ -83,6 +83,8 @@ export class WxMiniApp extends Channel {
 
         console.log("准备授权");
         console.log(authcode);
+        console.log(appid);
+        console.log(appsecret);
         console.log(m);
 
         m = await RestSession.Get(m);
@@ -171,8 +173,8 @@ export class WxMiniApp extends Channel {
 
         if (m.payload && m.payload.code) {
             let authcode = m.payload.code;
-            let appid = this.appid;
-            let appsec = this.appsecret;
+            let appid = this.appid.trim();
+            let appsec = this.appsecret.trim();
             let authtype = AuthType.MINI;
 
             // 请求token
