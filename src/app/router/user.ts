@@ -107,8 +107,7 @@ export class User implements IRouter {
         if (m.uid) {
             // 直接通过uid来查找账号，找到后生成对应sid
             let sdkui = await Query(make_tuple(SdkUserInfo, "kv.sdk_users"), {userid:m.uid});
-
-
+            console.log(sdkui);
 
             if (!sdkui) {
                 trans.status = Code.LOGIN_FAILED;
@@ -122,8 +121,11 @@ export class User implements IRouter {
                 uid: m.uid,
                 third: true
             });
+            console.log("查询到的用户信息");
+            console.log(ui);
             if (!ui) {
                 // 自动注册
+                console.log("自动注册");
                 ui = await User.Register(
                     m.uid,
                     m.info.nickName,
@@ -133,6 +135,7 @@ export class User implements IRouter {
                 );
                 logger.info("使用第三方凭据注册账号 " + ui.pid);
             }
+            console.log(ui);
 
         }
         else {
@@ -190,6 +193,7 @@ export class User implements IRouter {
 
         m.sid = ses.sid;
         m.info=ui;
+        console.log("登陆能成功吗？？？？")
         logger.log("{{=it.user}}@{{=it.sid}} 登陆成功", {user: m.info.pid, sid: m.sid});
 
         // 日志
