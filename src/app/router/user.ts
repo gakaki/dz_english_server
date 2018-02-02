@@ -134,7 +134,7 @@ export class User implements IRouter {
         }
         else {
             //更新一次userInfo
-            Update(UserInfo, null, [{pid: trans.current.pid}, {$set: {nickName: m.info.nickName, avatarUrl: m.info.avatarUrl}}]);
+            await Update(UserInfo, null, [{pid: trans.current.pid}, {$set: {nickName: m.info.nickName, avatarUrl: m.info.avatarUrl}}]);
         }
 
         if (!ui) {
