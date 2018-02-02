@@ -79,7 +79,7 @@ export class User implements IRouter {
     async login(trans: Trans) {
         let m: LoginInfo = trans.model;
         console.log("输入的参数");
-        console.log(m.info);
+        console.log(m);
         // 没有输入账号，而且没有找到sid
         if (!m.sid &&
             !m.uid &&
@@ -134,6 +134,8 @@ export class User implements IRouter {
         }
         else {
             //更新一次userInfo
+            console.log("用户更新");
+            console.log(trans.current.pid);
             await Update(UserInfo, null, [{pid: trans.current.pid}, {$set: {nickName: m.info.nickName, avatarUrl: m.info.avatarUrl}}]);
         }
 
