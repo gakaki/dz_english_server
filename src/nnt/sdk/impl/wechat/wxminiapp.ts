@@ -80,7 +80,16 @@ export class WxMiniApp extends Channel {
         m.authcode = authcode;
         m.appid = appid;
         m.appsecret = appsecret;
+
+        console.log("准备授权");
+        console.log(authcode);
+        console.log(m);
+
         m = await RestSession.Get(m);
+
+        console.log("微信返回结果");
+
+        console.log(m);
         if (!m) {
             logger.log("微信小程序：用户授权通过，获取 token 失败");
             return null;
