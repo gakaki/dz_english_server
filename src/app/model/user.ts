@@ -356,10 +356,10 @@ export class MinAppShare{
     @integer(3,[input],"二维码高度")
     width:number;
 
-    @string(5,[input],"平台信息")
+    //@string(5,[input],"平台信息")
     channel:string;
 
-    @string(7,[input],"用户id")
+
     uid:string;
 
     @string(4,[output])
@@ -368,6 +368,11 @@ export class MinAppShare{
     @string(8,[output])
     fileName:string;
 }
+
+export class MinShare{
+
+}
+
 @model()
 export class ItemQuery{
     @integer(1,[input])

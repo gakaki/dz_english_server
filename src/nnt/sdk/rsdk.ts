@@ -194,15 +194,25 @@ export class RSdk implements IRouter {
     async minappshare(trans:Transaction){
         let m:MinAppShare = trans.model;
 
-        let rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), {userid:m.uid});
+      /*  let rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), {userid:m.uid});
         if (!rcd) {
             trans.status = STATUS.TARGET_NOT_FOUND;
             trans.submit();
             return;
         }
+*/
+        console.log("渠道号");
+        console.log(m.channel);
 
-        let chann = this._sdk.channel(rcd.channel);
-        m=await chann.doMinAppShare(m, rcd);
+        let chann = this._sdk.channel(m.channel);
+
+        if (!chann) {
+            logger.warn("sdk: 没有找到channel " + m.channel);
+            trans.status = STATUS.TARGET_NOT_FOUND;
+            trans.submit();
+            return;
+        }
+        m=await chann.doMinAppShare(m);
         if (!m.url || !m.fileName) {
             trans.status = STATUS.THIRD_FAILED;
             trans.submit();

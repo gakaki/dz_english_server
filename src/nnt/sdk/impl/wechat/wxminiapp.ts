@@ -409,7 +409,7 @@ export class WxMiniApp extends Channel {
         return true;
     }
 
-    async doMinAppShare(m: MinAppShare, ui?: SdkUserInfo): Promise<any> {
+    async doMinAppShare(m: MinAppShare): Promise<any> {
        let accessToken=await this.doGetS2SAccessToken( this.getAppid(AuthType.MINI), this.getAppSecret(AuthType.MINI));
         let wechatGetWxaCode:WechatGetWxaCode= new WechatGetWxaCode();
         wechatGetWxaCode.accessToken=accessToken;

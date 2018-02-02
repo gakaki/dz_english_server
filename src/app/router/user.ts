@@ -74,6 +74,7 @@ export class User implements IRouter {
         
     }
 
+
     @action(LoginInfo, [frqctl])
     async login(trans: Trans) {
         let m: LoginInfo = trans.model;
@@ -127,6 +128,7 @@ export class User implements IRouter {
                 );
                 logger.info("使用第三方凭据注册账号 " + ui.pid);
             }
+
         }
         else {
             //更新一次userInfo
@@ -180,7 +182,7 @@ export class User implements IRouter {
         }
 
         m.sid = ses.sid;
-
+        m.info=ui;
         logger.log("{{=it.user}}@{{=it.sid}} 登陆成功", {user: m.info.pid, sid: m.sid});
 
         // 日志
@@ -189,6 +191,7 @@ export class User implements IRouter {
             obj.type = UserActionRecordType.LOGIN;
             obj.data = trans.info;
         }));
+
 
         trans.submit();
     }
@@ -204,9 +207,10 @@ export class User implements IRouter {
               return
           }*/
         //m.uid=ui.uid;
-        m.uid="123";
-        m.channel = 'wxminiapp';
+        //m.uid="123";
+        //m.channel = 'wxminiapp';
        // m.method=LoginMethod.WECHAT_MINI_APP;
+        console.log(m);
         let a=await  Call("sdk", 'sdk.minappshare', m);
 
 
