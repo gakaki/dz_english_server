@@ -419,9 +419,13 @@ export class WxMiniApp extends Channel {
         let result = await RestSession.Get(wechatGetWxaCode);
         console.log(result);
         let localData=new Date().toLocaleDateString();
-        let firstPth="./"+m.uid;
-        let secondPath="./"+m.uid+localData+"/";
+        let rootPath="./minAPPShare/";
+        let firstPth=rootPath+m.uid+"/";
+        let secondPath=firstPth+localData+"/";
         try{
+            if(!await fs.existsSync(rootPath)){
+                await fs.mkdirSync(rootPath);
+            }
             if(!await fs.existsSync(firstPth)){
                 await fs.mkdirSync(firstPth);
             }
@@ -434,6 +438,10 @@ export class WxMiniApp extends Channel {
             await fs.writeFileSync(secondPath+fileName, result);
             m.url =secondPath;
             m.fileName=fileName;
+            console.log("文件路径");
+            console.log(secondPath);
+            console.log("文件名字");
+            console.log(fileName);
         }catch (err){
             logger.warn("文件或二维码创建失败"+err);
         }

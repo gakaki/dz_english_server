@@ -1,7 +1,7 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
 import {
     AuthInfo, ItemQuery, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppShare, PictureInfo, QueryUser,
-    QueryUserVipInfo,
+    QueryUserVipInfo, ShareCode,
     UserActionRecord, UserActionRecordType, UserInfo, UserPicture, UserPictures, UserShare, UserShareCounter,
     UserShareDailyCounter, UserSid, UserTili, UserType, UserVipGiftCounter
 } from "../model/user";
@@ -192,14 +192,15 @@ export class User implements IRouter {
             obj.data = trans.info;
         }));
 
-
+        console.log("输出用户");
+        console.log(m);
         trans.submit();
     }
 
 
-    @action(MinAppShare)
+    @action(ShareCode)
     async minappshare(trans: Trans) {
-        let m:MinAppShare = trans.model;
+        let m:ShareCode = trans.model;
         /*  let ui:UserInfo=await User.FindUserBySid(trans.sid);
           if(ui==null){
               trans.status = Code.USER_NOT_FOUND;
@@ -208,10 +209,14 @@ export class User implements IRouter {
           }*/
         //m.uid=ui.uid;
         //m.uid="123";
-        //m.channel = 'wxminiapp';
-       // m.method=LoginMethod.WECHAT_MINI_APP;
+        let min:MinAppShare=new MinAppShare();
+        min.channel = 'wxminiapp';
+        min.uid="123";
+        min.width=m.width;
+        min.page=m.page;
+        min.scene=m.scene;
         console.log(m);
-        let a=await  Call("sdk", 'sdk.minappshare', m);
+        let a=await  Call("sdk", 'sdk.minappshare', min);
 
 
         trans.submit();

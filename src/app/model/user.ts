@@ -347,6 +347,18 @@ export class UserVipGiftCounter {
 @model()
 export class MinAppShare{
 
+    @string(5,[input],"平台信息")
+    channel:string;
+
+    @string(6,[input])
+    uid:string;
+
+    @string(4,[output])
+    url:string;
+
+    @string(8,[output])
+    fileName:string;
+
     @string(1,[input],"附带红包的 id")
     scene:string;
 
@@ -355,22 +367,17 @@ export class MinAppShare{
 
     @integer(3,[input],"二维码高度")
     width:number;
-
-    //@string(5,[input],"平台信息")
-    channel:string;
-
-
-    uid:string;
-
-    @string(4,[output])
-    url:string;
-
-    @string(8,[output])
-    fileName:string;
 }
 
-export class MinShare{
+export class ShareCode{
+    @string(1,[input],"附带红包的 id")
+    scene:string;
 
+    @string(2,[input],"已经发布的小程序页面")
+    page:string;
+
+    @integer(3,[input],"二维码高度")
+    width:number;
 }
 
 @model()
