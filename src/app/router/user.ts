@@ -78,6 +78,8 @@ export class User implements IRouter {
     @action(LoginInfo, [frqctl])
     async login(trans: Trans) {
         let m: LoginInfo = trans.model;
+        console.log("输入的参数");
+        console.log(m);
         // 没有输入账号，而且没有找到sid
         if (!m.sid &&
             !m.uid &&
@@ -99,11 +101,13 @@ export class User implements IRouter {
         let ui: UserInfo;
 
         // 第三方登陆
+        console.log("第三方登陆");
+        console.log(m.uid);
+        console.log("当前时间"+new Date().toLocaleString());
         if (m.uid) {
             // 直接通过uid来查找账号，找到后生成对应sid
             let sdkui = await Query(make_tuple(SdkUserInfo, "kv.sdk_users"), {userid:m.uid});
-
-
+            console.log(sdkui);
 
             if (!sdkui) {
                 trans.status = Code.LOGIN_FAILED;
@@ -117,8 +121,11 @@ export class User implements IRouter {
                 uid: m.uid,
                 third: true
             });
+            console.log("查询到的用户信息");
+            console.log(ui);
             if (!ui) {
                 // 自动注册
+                console.log("自动注册");
                 ui = await User.Register(
                     m.uid,
                     m.info.nickName,
@@ -127,13 +134,16 @@ export class User implements IRouter {
                     m.inviterpid,
                 );
                 logger.info("使用第三方凭据注册账号 " + ui.pid);
+            }else{
+                //更新一次userInfo
+                console.log("用户更新");
+                console.log(ui.pid);
+                await Update(UserInfo, null, [{pid: ui.pid}, {$set: {nickName: m.info.nickName, avatarUrl: m.info.avatarUrl}}]);
             }
+            console.log(ui);
 
         }
-        else {
-            //更新一次userInfo
-            Update(UserInfo, null, [{pid: trans.current.pid}, {$set: {nickName: m.info.nickName, avatarUrl: m.info.avatarUrl}}]);
-        }
+
 
         if (!ui) {
             trans.status = Code.LOGIN_FAILED;

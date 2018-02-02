@@ -92,7 +92,7 @@ export class Sms {
 @model()
 export class LoginInfo {
 
-    @type(3, UserInfo, [input], "用户信息")
+    @type(3, UserInfo, [input,output], "用户信息")
     info: UserInfo;
 
     @string(4, [output])
