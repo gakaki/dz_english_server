@@ -21,10 +21,10 @@ import {logger} from "../../nnt/core/logger";
 import {UserBriefInfo, UserVipInfo} from "../model/common";
 import {IApiServer} from "../../nnt/server/apiserver";
 import {AbstractCronTask, CronAdd, PerDay} from "../../nnt/manager/crons";
-import {Auth, SdkUserInfo} from "../../nnt/sdk/msdk";
+import {Auth, LoginMethod, SdkUserInfo} from "../../nnt/sdk/msdk";
 import {REGEX_PHONE} from "../../nnt/component/pattern";
 import {configs} from "../model/xlsconfigs";
-import {LoginMethod} from "../../nnt/sdk/client/src/service";
+
 
 export class User implements IRouter {
     action: string = "user";
