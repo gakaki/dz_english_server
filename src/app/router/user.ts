@@ -46,12 +46,17 @@ export class User implements IRouter {
     @action(AuthInfo)
     async auth(trans: Trans) {
         let m: AuthInfo = trans.model;
+
+
+
         let sdkAuth = new Auth();
         sdkAuth.payload = m.payload;
         sdkAuth.channel = 'wxminiapp';
+        sdkAuth.method=m.payload.login;
 
         let r =await Call('sdk', 'sdk.auth', sdkAuth);
 
+        console.log("拿到的数据+++++++++++++++++++"+r.model);
         if (r.model.uid) {
             m.uid = r.model.uid;
         }
@@ -193,7 +198,7 @@ export class User implements IRouter {
         m.uid="123";
         let a=await  Call("sdk", 'sdk.minappshare', m);
         trans.status=a.status;
-        console.log(a.model);
+
         trans.submit();
 
     }

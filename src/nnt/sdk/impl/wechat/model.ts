@@ -3,7 +3,7 @@ import {
     array, double, input, integer, json, model, optional, output, string, string_t,
     type
 } from "../../../core/proto";
-import {Base, IResponseData, RequestParams} from "../../../session/model";
+import {Base, HttpMethod, IResponseData, RequestParams} from "../../../session/model";
 import {logger} from "../../../core/logger";
 import {colarray, coldouble, colinteger, colstring, table} from "../../../store/proto";
 import {PaytoUser, SdkUserInfo, Support} from "../../msdk";
@@ -255,9 +255,39 @@ export class WechatRefreshToken extends WechatModel {
 }
 
 
-export class WechatGetWxaCode extends WechatModel{
-    requestUrl(): string {
-        return undefined;
+@model()
+@table('', 'wx_miniapp_share')
+export class WechatGetWxaCode extends Base{
+    constructor() {
+        super();
+        this.method = HttpMethod.POST;
     }
+
+    requestUrl(): string {
+        return "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token="+this.accessToken;
+    }
+    requestParams(): RequestParams {
+        let rp = new RequestParams();
+        rp.fields = {
+            scene: this.scene,
+            page: this.page,
+            width: this.width
+        };
+        return rp;
+    }
+    @string(1,[input])
+    @colstring()
+    scene:string;
+
+    @string(2,[input])
+    @colstring()
+    page:string;
+
+    @string(3,[input])
+    @colinteger()
+    width:	number;
+
+    @string(4,[input])
+    accessToken:string;
 
 }

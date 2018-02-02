@@ -10,7 +10,7 @@ import {
     Withdraw
 } from "../../msdk";
 import {Fast} from "../../../component/encode";
-import {AuthType, WechatRefreshToken, WechatToken, WechatUserProfile, WxminiappToken} from "./model";
+import {AuthType, WechatGetWxaCode, WechatRefreshToken, WechatToken, WechatUserProfile, WxminiappToken} from "./model";
 import {RestSession} from "../../../session/rest";
 import {DateTime} from "../../../core/time";
 import {Insert, Query, Update} from "../../../manager/dbmss";
@@ -153,6 +153,8 @@ export class WxMiniApp extends Channel {
         //小程序里先通过sdk.auth传入code,然后此处生成uid，小程序用uid调用user.login(带回uid和微信用户信息），
         //之后在router/user.ts的login里完成登录、注册或更新用户信息、返回sid；
         //下次登录直接用sid登录，sid会自动续期
+
+        logger.info("拿到的数据"+m);
         if (m.payload && m.payload.code) {
             let authcode = m.payload.code;
             let appid = this.appid;
@@ -389,8 +391,16 @@ export class WxMiniApp extends Channel {
 
     async doMinAppShare(m: MinAppShare, ui?: SdkUserInfo): Promise<any> {
        let accessToken=await this.doGetS2SAccessToken( this.getAppid(AuthType.MINI), this.getAppSecret(AuthType.MINI));
-       let url ="https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token="+accessToken;
-
+        let wechatGetWxaCode:WechatGetWxaCode= new WechatGetWxaCode();
+        wechatGetWxaCode.accessToken=accessToken;
+        wechatGetWxaCode.scene=m.scene;
+        wechatGetWxaCode.page=m.page;
+        wechatGetWxaCode.width=m.width;
+        let result = await RestSession.Get(wechatGetWxaCode);
+        if (!result) {
+            console.log(result);
+            return false;
+        }
         return true;
     }
 
