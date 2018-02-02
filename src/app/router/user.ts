@@ -78,6 +78,8 @@ export class User implements IRouter {
     @action(LoginInfo, [frqctl])
     async login(trans: Trans) {
         let m: LoginInfo = trans.model;
+        console.log("输入的参数");
+        console.log(m.info);
         // 没有输入账号，而且没有找到sid
         if (!m.sid &&
             !m.uid &&
