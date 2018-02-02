@@ -8,7 +8,7 @@ import {Trans} from "../../contrib/manager/trans";
 import {UserInfo} from "../model/user";
 import {User} from "./user";
 import {Code} from "../model/code";
-import {Random} from "../../nnt/core/kernel";
+import {ArrayT, Random} from "../../nnt/core/kernel";
 import {Aggregate, Count, Insert, Query, QueryAll, Update} from "../../nnt/manager/dbmss";
 import {DateTime} from "../../nnt/core/time";
 import {configs} from "../model/xlsconfigs";
@@ -410,11 +410,31 @@ export class Guessnum implements IRouter {
             rankInfo.uid=record._id;
             rankInfo.userInfo=await User.FindUserInfoByUid(record._id);
             rankInfo.moneyGot=record.moneyGot;
-            rankInfo.guessRecords=await QueryAll(PackGuessRecord,{pid:pid,uid:record._id});
+            let records:Array<PackGuessRecord>=await QueryAll(PackGuessRecord,{pid:pid,uid:record._id});
+            rankInfo.guessRecords=records;
+            rankInfo.maxMarkId=Guessnum.getMaxGuessRecord(records);
             rankInfos.push(rankInfo);
         }
 
         return rankInfos;
+    }
+
+    protected static getMaxGuessRecord(records:Array<PackGuessRecord>):string{
+        let recordsSort=records.sort(function(object1:PackGuessRecord, object2:PackGuessRecord) {
+            let value1 = object1["userMark"];
+            let value2 = object2["userMark"];
+            return value2.localeCompare(value1);
+        });
+        let cf=configs.evaluates;
+        let maxRecord=recordsSort[0];
+        console.log(maxRecord);
+        for(let i of cf){
+            //console.log(i);
+            if(i[1]==maxRecord.userMark){
+                return i[0];
+            }
+        }
+        //return "1"
     }
 
     protected static async getReceivePackageRecordsCountByUid(uid:string){

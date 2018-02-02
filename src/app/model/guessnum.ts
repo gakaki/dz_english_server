@@ -114,6 +114,7 @@ export class PackGuessRecord{
     @double(4,[output],"用户获得的金钱")
     @coldouble()
     userGetMoney:number;
+
    @string(5,[output],"用户回答的结果")
     @colstring()
     userMark:string;
@@ -147,8 +148,13 @@ export class RankInfo{
     @double(3,[output],"获取的总金额")
     moneyGot:number;
 
+    @string(5,[output])
+    maxMarkId:string
+
     @array(4,PackGuessRecord,[output],"竞猜记录")
     guessRecords:PackGuessRecord[];
+
+
 }
 
 @model()
