@@ -187,7 +187,7 @@ export class WxminiappToken extends WechatModel {
         rp.fields = {
             appid: this.appid,
             secret: this.appsecret,
-            code: this.authcode,
+            js_code: this.authcode,
             grant_type: "authorization_code"
         };
         return rp;
