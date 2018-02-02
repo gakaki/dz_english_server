@@ -200,7 +200,7 @@ export class WxMiniApp extends Channel {
                 let r = await Update(make_tuple(this._sdk.dbsrv, SdkUserInfo), null, [
                     // 从openid修改成unionid
                     {userid: lg.openid},
-                    {$set: {deviceid: lg.unionid}},
+                    {$set: {deviceid: lg.unionid,userid:lg.openid}},
                     {upsert: true}]);
                 m.uid =lg.openid;//直接使用openid
                 return m;
