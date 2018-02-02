@@ -4,12 +4,13 @@ import {
 } from "../../nnt/core/proto";
 import { colboolean, coldouble, colinteger, coljson, colstring, table} from "../../nnt/store/proto";
 import {UserInfo} from "./user";
+import {configs} from "./xlsconfigs";
 
 
 
 
 @model()
-@table('kv', 'packInfo',{ttl:24*60*1000})
+@table('kv', 'packInfo',{ttl:Number(configs.Parameter.Get("expire").value)*60*1000})
 export class PackInfo {
     @integer(1, [output], "红包id")
     @colinteger()
@@ -39,7 +40,7 @@ export class PackInfo {
 
     @integer(6,[output],"剩余竞猜次数")
     @colinteger()
-    guessCount=20;
+    guessCount=Number(configs.Parameter.Get("timeslimit").value);
 
     @boolean(7,[input,output],"是否使用红包券")
     @colboolean()
@@ -56,6 +57,9 @@ export class PackInfo {
 
     @colboolean()
     A:boolean;
+
+    @colboolean()
+    miss:boolean;
 
     @integer(8,[output],"红包状态")
     @colinteger()
