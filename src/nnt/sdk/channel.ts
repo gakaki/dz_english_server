@@ -5,6 +5,7 @@ import {
     Support, Withdraw
 } from "./msdk";
 import {Transaction} from "../server/transaction";
+import {MinAppShare} from "../../app/model/user";
 
 export abstract class Channel {
 
@@ -20,7 +21,7 @@ export abstract class Channel {
     abstract doInfo(m: Info, sp: Support): Promise<void>;
 
     // 处理授权
-    abstract doAuth(m: Auth): Promise<boolean>;
+    abstract doAuth(m: Auth): Promise<Auth>;
 
     // 检查授权是否过期
     abstract doCheckExpire(ui: SdkUserInfo): Promise<boolean>;
@@ -51,6 +52,9 @@ export abstract class Channel {
 
     //提现（从豆子账号通过企业付款给用户）
     abstract doWithdraw(m: Withdraw, ui?: SdkUserInfo): Promise<void>;
+
+    //微信小程序分享二维码
+    abstract doMinAppShare(m: MinAppShare, ui?: SdkUserInfo):Promise<any>;
 
     protected _sdk: Sdk;
 }

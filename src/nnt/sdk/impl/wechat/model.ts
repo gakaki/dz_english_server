@@ -253,3 +253,11 @@ export class WechatRefreshToken extends WechatModel {
     @string(6, [output])
     scope: string;
 }
+
+
+export class WechatGetWxaCode extends WechatModel{
+    requestUrl(): string {
+        return undefined;
+    }
+
+}

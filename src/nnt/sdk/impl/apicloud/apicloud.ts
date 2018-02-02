@@ -8,8 +8,10 @@ import {RegisterChannel, Sdk} from "../../sdk";
 import {Transaction} from "../../../server/transaction";
 import {Call} from "../../../manager/servers";
 import {MediaSupport} from "../../../server/mediastore";
+import {MinAppShare} from "../../../../app/model/user";
 
 export class Apicloud extends Channel {
+
 
     constructor(sdk: Sdk) {
         super(sdk);
@@ -18,16 +20,18 @@ export class Apicloud extends Channel {
     config(cfg: IndexedObject): boolean {
         return true;
     }
-
+    async doMinAppShare(m: MinAppShare, ui?: SdkUserInfo): Promise<any> {
+        return false;
+    }
     async doInfo(m: Info, sp: Support): Promise<void> {
     }
 
-    async doAuth(m: Auth): Promise<boolean> {
+    async doAuth(m: Auth): Promise<Auth> {
         if (Mask.Has(m.method, LoginMethod.WECHAT_MASK)) {
             let chann = this._sdk.channel("wechat");
             return chann.doAuth(m);
         }
-        return true;
+        return m;
     }
 
     async doCheckExpire(ui: SdkUserInfo): Promise<boolean> {

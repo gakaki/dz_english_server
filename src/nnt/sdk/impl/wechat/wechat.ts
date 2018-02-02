@@ -26,8 +26,10 @@ import {logger} from "../../../core/logger";
 import {MediaSupport} from "../../../server/mediastore";
 import {S2SWechatTicket, S2SWechatToken} from "./s2smodel";
 import {ACROOT} from "../../../acl/acl";
+import {MinAppShare} from "../../../../app/model/user";
 
 export class Wechat extends Channel {
+
 
     constructor(sdk: Sdk) {
         super(sdk);
@@ -193,7 +195,7 @@ export class Wechat extends Channel {
         }
     }
 
-    async doAuth(m: Auth): Promise<boolean> {
+    async doAuth(m: Auth): Promise<Auth> {
         let pl = m.payload;
         if (pl && pl.wechatcode) {
             // 则是微信登陆成功的回调页面
@@ -231,7 +233,7 @@ export class Wechat extends Channel {
                         {$set: pf.info},
                         {upsert: true}]);
                     m.uid = GetInnerId(r);
-                    return true;
+                    return m;
                 }
             }
             // 否则走重新授权的流程
@@ -242,9 +244,11 @@ export class Wechat extends Channel {
         let salt = Random.Rangei(0, 1000);
         m.targeturl = this.authurl(this._fast.encode(toJson({wechat: salt, login: m.method})), m.method);
 
-        return true;
+        return m;
     }
-
+    async doMinAppShare(m: MinAppShare, ui?: SdkUserInfo): Promise<any> {
+        return false;
+    }
     async doLogin(m: Login, ui: SdkUserInfo): Promise<boolean> {
         return true;
     }

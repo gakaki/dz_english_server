@@ -13,6 +13,7 @@ import {Output} from "../../../store/proto";
 import {logger} from "../../../core/logger";
 import {RestSession} from "../../../session/rest";
 import {static_cast} from "../../../core/core";
+import {MinAppShare} from "../../../../app/model/user";
 
 interface AppleCfg {
 
@@ -21,6 +22,7 @@ interface AppleCfg {
 }
 
 export class Apple extends Channel {
+
 
     constructor(sdk: Sdk) {
         super(sdk);
@@ -33,12 +35,14 @@ export class Apple extends Channel {
         this.sandbox = c.sandbox;
         return true;
     }
-
+    async doMinAppShare(m: MinAppShare, ui?: SdkUserInfo): Promise<any> {
+        return false;
+    }
     async doInfo(m: Info, sp: Support): Promise<void> {
     }
 
-    async doAuth(m: Auth): Promise<boolean> {
-        return true;
+    async doAuth(m: Auth): Promise<Auth> {
+        return m;
     }
 
     async doCheckExpire(ui: SdkUserInfo): Promise<boolean> {

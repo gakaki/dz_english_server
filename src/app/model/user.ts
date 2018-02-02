@@ -338,3 +338,21 @@ export class UserVipGiftCounter {
     @colinteger()
     time: number;
 }
+
+@model()
+export class MinAppShare{
+
+    @string(1,[input],"附带红包的 id")
+    scene:string;
+
+    @string(2,[input],"已经发布的小程序页面")
+    page:string;
+
+    @integer(3,[input],"二维码高度")
+    width:number;
+
+    uid:string;
+
+    @string(4,[output])
+    url:string;
+}

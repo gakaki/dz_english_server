@@ -26,8 +26,10 @@ import {logger} from "../../../core/logger";
 import {MediaSupport} from "../../../server/mediastore";
 import {S2SWechatTicket, S2SWechatToken} from "./s2smodel";
 import {ACROOT} from "../../../acl/acl";
+import {MinAppShare} from "../../../../app/model/user";
 
 export class WxMiniApp extends Channel {
+
 
     constructor(sdk: Sdk) {
         super(sdk);
@@ -147,7 +149,7 @@ export class WxMiniApp extends Channel {
         }
     }
 
-    async doAuth(m: Auth): Promise<boolean> {
+    async doAuth(m: Auth): Promise<Auth> {
         //小程序里先通过sdk.auth传入code,然后此处生成uid，小程序用uid调用user.login(带回uid和微信用户信息），
         //之后在router/user.ts的login里完成登录、注册或更新用户信息、返回sid；
         //下次登录直接用sid登录，sid会自动续期
@@ -181,13 +183,13 @@ export class WxMiniApp extends Channel {
                     {$set: {deviceid: lg.unionid}},
                     {upsert: true}]);
                 m.uid =lg.openid;//直接使用openid
-                return true;
+                return m;
             }
             // 否则走重新授权的流程
 
         }
 
-        return true;
+        return m;
     }
 
     async doLogin(m: Login, ui: SdkUserInfo): Promise<boolean> {
@@ -382,6 +384,13 @@ export class WxMiniApp extends Channel {
 
     async doShare(sa: Share, ui: SdkUserInfo): Promise<boolean> {
         // 如果是ICON分享，则需要返回初始化微信分享用的数据
+        return true;
+    }
+
+    async doMinAppShare(m: MinAppShare, ui?: SdkUserInfo): Promise<any> {
+       let accessToken=await this.doGetS2SAccessToken( this.getAppid(AuthType.MINI), this.getAppSecret(AuthType.MINI));
+       let url ="https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token="+accessToken;
+
         return true;
     }
 

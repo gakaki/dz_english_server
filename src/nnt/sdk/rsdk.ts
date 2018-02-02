@@ -10,6 +10,7 @@ import {format, make_tuple, ObjectT} from "../core/kernel";
 import {STATUS} from "../core/models";
 import {TODAY_DAY, TODAY_MONTH, TODAY_YEAR} from "../component/today";
 import {logger} from "../core/logger";
+import {MinAppShare} from "../../app/model/user";
 
 export class RSdk implements IRouter {
     action = "sdk";
@@ -79,12 +80,15 @@ export class RSdk implements IRouter {
             return;
         }
 
-        if (!await chann.doAuth(m)) {
+        let authA= await chann.doAuth(m);
+
+        logger.info("返回的授权信息"+authA);
+        if(! authA.uid){
             trans.status = STATUS.THIRD_FAILED;
             trans.submit();
             return;
         }
-
+        m.uid = authA.uid;
         trans.submit();
     }
 
@@ -180,6 +184,29 @@ export class RSdk implements IRouter {
         }
 
         trans.submit();
+    }
+
+    @action(MinAppShare,[],"微信小程序分享二维码")
+    async minappshare(trans:Transaction){
+        let m:MinAppShare = trans.model;
+
+        let rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), m.uid);
+        if (!rcd) {
+            trans.status = STATUS.TARGET_NOT_FOUND;
+            trans.submit();
+            return;
+        }
+        let chann = this._sdk.channel(rcd.channel);
+        if (!await chann.doMinAppShare(m, rcd)) {
+            trans.status = STATUS.THIRD_FAILED;
+            trans.submit();
+            return;
+        }
+
+        m.url="1234";
+        trans.submit();
+
+
     }
 
     @action(Pay, [], "服务端给渠道下单，返回客户端支付数据发起客户端支付")

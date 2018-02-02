@@ -1,6 +1,6 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
 import {
-    AuthInfo, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, PictureInfo, QueryUser, QueryUserVipInfo,
+    AuthInfo, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppShare, PictureInfo, QueryUser, QueryUserVipInfo,
     UserActionRecord, UserActionRecordType, UserInfo, UserPicture, UserPictures, UserShare, UserShareCounter,
     UserShareDailyCounter, UserSid, UserTili, UserType, UserVipGiftCounter
 } from "../model/user";
@@ -50,10 +50,10 @@ export class User implements IRouter {
         sdkAuth.payload = m.payload;
         sdkAuth.channel = 'wxminiapp';
 
-        let r = Call('sdk', 'sdk.auth', sdkAuth);
+        let r =await Call('sdk', 'sdk.auth', sdkAuth);
 
-        if (r) {
-            m.uid = sdkAuth.uid;
+        if (r.model.uid) {
+            m.uid = r.model.uid;
         }
         else {
             trans.status = Code.VERIFY_FAILED;
@@ -177,6 +177,25 @@ export class User implements IRouter {
         }));
 
         trans.submit();
+    }
+
+
+    @action(MinAppShare)
+    async minappshare(trans: Trans) {
+        let m:MinAppShare = trans.model;
+        /*  let ui:UserInfo=await User.FindUserBySid(trans.sid);
+          if(ui==null){
+              trans.status = Code.USER_NOT_FOUND;
+              trans.submit();
+              return
+          }*/
+        //m.uid=ui.uid;
+        m.uid="123";
+        let a=await  Call("sdk", 'sdk.minappshare', m);
+        trans.status=a.status;
+        console.log(a.model);
+        trans.submit();
+
     }
 
     // 清除该SID的登陆信息
