@@ -157,6 +157,9 @@ export class WxMiniApp extends Channel {
         logger.info("我要进行微信授权登陆");
         console.log(m);
 
+        console.log(m.payload);
+        console.log(m.payload.code);
+
         if (m.payload && m.payload.code) {
             let authcode = m.payload.code;
             let appid = this.appid;
@@ -165,6 +168,8 @@ export class WxMiniApp extends Channel {
 
             // 请求token
             let lg = await this.doReqToken(authcode, appid, appsec, authtype);
+            console.log("获取的token");
+            console.log(lg);
             if (lg) {
                 // 请求个人信息
                 // let pf = await this.doReqProfile(lg.session_key, lg.openid);

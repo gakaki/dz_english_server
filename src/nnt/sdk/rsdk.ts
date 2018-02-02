@@ -74,7 +74,6 @@ export class RSdk implements IRouter {
         console.log("第三方授权");
 
         let chann = this._sdk.channel(m.channel);
-        console.log(chann);
 
         if (!chann) {
             logger.warn("sdk: 没有找到channel " + m.channel);

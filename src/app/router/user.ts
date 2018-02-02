@@ -60,7 +60,8 @@ export class User implements IRouter {
 
         let r =await Call('sdk', 'sdk.auth', sdkAuth);
 
-        console.log("拿到的数据+++++++++++++++++++"+r.model);
+        console.log("拿到的数据+++++++++++++++++++");
+        console.log(r.model);
         if (r.model) {
             m.uid = r.model.uid;
         }
