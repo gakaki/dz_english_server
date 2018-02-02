@@ -1,5 +1,6 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
 import {
+    Acceleration,
     ClearCD, GetPack, Guess, PackGuessRecord, PackInfo, PackRankingList, PackRecords, RankInfo, ReceivePackage,
     SendPackage,
     UserPackRecord,
@@ -12,6 +13,7 @@ import {ArrayT, Random} from "../../nnt/core/kernel";
 import {Aggregate, Count, Insert, Query, QueryAll, Update} from "../../nnt/manager/dbmss";
 import {DateTime} from "../../nnt/core/time";
 import {configs} from "../model/xlsconfigs";
+import {Delta} from "../model/item";
 
 
 
@@ -19,7 +21,7 @@ import {configs} from "../model/xlsconfigs";
 
 export class Guessnum implements IRouter {
     action :string = "guessnum";
-
+    //发送红包
     @action(PackInfo)
     async sendpack(trans: Trans){
         let m: PackInfo = trans.model;
@@ -32,6 +34,26 @@ export class Guessnum implements IRouter {
        m.userInfo=ui;
 
        // m.userInfo=null;
+
+        let delta = new Delta();
+        if(ui.itemCount(configs.Item.MONEY)<m.money){
+            trans.status = Code.NEED_ITEMS;
+            trans.submit();
+            return;
+        }
+
+        delta.addkv(configs.Item.MONEY,m.money * -1);
+       await User.ApplyDelta(ui,delta);
+       if(m.useTicket){
+           if(ui.itemCount(configs.Item.CASHCOUPON)<0){
+               trans.status=Code.NEED_ITEMS;
+               trans.submit();
+               return;
+           }
+           delta.addkv(configs.Item.CASHCOUPON,-1);
+           await User.ApplyDelta(ui,delta);
+       }
+
 
        let psw =Guessnum.getPack();
        let pss="";
@@ -46,7 +68,7 @@ export class Guessnum implements IRouter {
         m.status=pack.status;
         trans.submit();
     }
-
+    //竞猜数字
     @action(Guess)
     async guesspack(trans:Trans){
         let m:Guess=trans.model;
@@ -86,9 +108,6 @@ export class Guessnum implements IRouter {
             return
         }
 
-        if(pack.CDList){
-            console.log("111111");
-        }
         if(pack.CDList){
             console.log("存在cd列表");
             if(pack.CDList[trans.sid]){
@@ -172,9 +191,14 @@ export class Guessnum implements IRouter {
         console.log("结束");
         console.log(pack.CDList);
         await Guessnum.saveUserGuessRecord(ui.uid,m.guessNum,m.moneyGeted,m.mark,m.pid);
+
+        let delta = new Delta();
+        delta.addkv(configs.Item.MONEY,m.moneyGeted);
+        await User.ApplyDelta(ui,delta);
+
         trans.submit();
     }
-
+    //清除等待CD
     @action(ClearCD)
     async clearcd(trans:Trans){
         console.log("没有进来？");
@@ -197,6 +221,15 @@ export class Guessnum implements IRouter {
             return
         }
 
+        if(ui.itemCount(configs.Item.ACCELERATION)<0){
+            trans.status=Code.NEED_ITEMS;
+            trans.submit();
+            return;
+        }
+        let delta = new Delta();
+        delta.addkv(configs.Item.ACCELERATION,-1);
+        await User.ApplyDelta(ui,delta);
+
         if(pack.CDList[trans.sid]){
             console.log(pack.CDList[trans.sid]);
             console.log(pack.CDList[trans.sid]+3*60*1000);
@@ -212,7 +245,7 @@ export class Guessnum implements IRouter {
         }
         trans.submit();
     }
-
+    //红包竞猜记录
     @action(PackRecords)
     async getpackrecords(trans:Trans){
         let m:PackRecords=trans.model;
@@ -242,6 +275,8 @@ export class Guessnum implements IRouter {
         trans.submit();
 
     }
+
+    //红包竞猜排行榜
     @action(PackRankingList)
     async getpackrankinglist(trans:Trans){
         let m:PackRankingList=trans.model;
@@ -260,7 +295,7 @@ export class Guessnum implements IRouter {
        // console.log(m);
         trans.submit()
     }
-
+    //用户红包记录
     @action(UserPackRecord)
     async getuserpackrecords(trans:Trans){
         let m:UserPackRecord = trans.model;
@@ -288,6 +323,23 @@ export class Guessnum implements IRouter {
         console.log(m);
         trans.submit()
 }
+   //获取加速卡
+   @action(Acceleration)
+   async getacceleration(trans:Trans){
+       let m:Acceleration = trans.model;
+       let ui:UserInfo=await User.FindUserBySid(trans.sid);
+       if(ui==null){
+           trans.status = Code.USER_NOT_FOUND;
+           trans.submit();
+           return
+       }
+
+       let delta = new Delta();
+       delta.addkv(configs.Item.ACCELERATION,m.num);
+       await User.ApplyDelta(ui,delta);
+
+       trans.submit();
+   }
 
     protected static getPack(){
         let psw=new Set();

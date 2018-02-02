@@ -8,6 +8,7 @@ import {logger} from "../../../core/logger";
 import {colarray, coldouble, colinteger, colstring, table} from "../../../store/proto";
 import {PaytoUser, SdkUserInfo, Support} from "../../msdk";
 import {DateTime} from "../../../core/time";
+import {any} from "async";
 
 export enum AuthType {
     PUB = 1, // 公众号授权
@@ -289,5 +290,8 @@ export class WechatGetWxaCode extends Base{
 
     @string(4,[input])
     accessToken:string;
+
+    @array(5,Object,[output])
+    sharePicture:any[]
 
 }

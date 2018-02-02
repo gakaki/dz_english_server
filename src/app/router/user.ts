@@ -1,6 +1,7 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
 import {
-    AuthInfo, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppShare, PictureInfo, QueryUser, QueryUserVipInfo,
+    AuthInfo, ItemQuery, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppShare, PictureInfo, QueryUser,
+    QueryUserVipInfo,
     UserActionRecord, UserActionRecordType, UserInfo, UserPicture, UserPictures, UserShare, UserShareCounter,
     UserShareDailyCounter, UserSid, UserTili, UserType, UserVipGiftCounter
 } from "../model/user";
@@ -122,7 +123,7 @@ export class User implements IRouter {
                     m.info.nickName,
                     m.info.avatarUrl,
                     true,
-                    m.inviterpid
+                    m.inviterpid,
                 );
                 logger.info("使用第三方凭据注册账号 " + ui.pid);
             }
@@ -204,8 +205,10 @@ export class User implements IRouter {
           }*/
         //m.uid=ui.uid;
         m.uid="123";
+        m.channel = 'wxminiapp';
+       // m.method=LoginMethod.WECHAT_MINI_APP;
         let a=await  Call("sdk", 'sdk.minappshare', m);
-        trans.status=a.status;
+
 
         trans.submit();
 
@@ -234,7 +237,7 @@ export class User implements IRouter {
             avatarUrl: avatar,
             registertime: DateTime.Now(),
             third: third,
-            inviterpid: inviterpid
+            inviterpid: inviterpid,
         });
 
         // 从innerId 直接生成uid
@@ -287,6 +290,18 @@ export class User implements IRouter {
         trans.submit();
     }
 
+    @action(ItemQuery)
+    async getiteminfo(trans:Trans){
+        let m:ItemQuery = trans.model;
+        let ui:UserInfo=await User.FindUserBySid(trans.sid);
+        if(ui==null){
+            trans.status = Code.USER_NOT_FOUND;
+            trans.submit();
+            return
+        }
+        m.stock=ui.itemCount(m.itemId);
+        trans.submit();
+    }
 
 
     // @action(ApplyCode, [], "提交验证码")

@@ -1,14 +1,18 @@
 import {
-    array, auth, boolean, enumm, file, FileType, input, integer, json, model, optional, output, string, string_t,
+    array, auth, boolean, double, enumm, file, FileType, input, integer, integer_t, json, map, model, optional, output,
+    string,
+    string_t,
     type
 } from "../../nnt/core/proto";
-import {colarray, colboolean, colinteger, coljson, colstring, coltype, table} from "../../nnt/store/proto";
+import {colarray, colboolean, coldouble, colinteger, coljson, colstring, coltype, table} from "../../nnt/store/proto";
 import {Delta, Item} from "./item";
 import {DateTime} from "../../nnt/core/time";
 import {UserBriefInfo, UserVipInfo} from "./common";
 import {Check} from "../../nnt/component/maskword";
 import {configs} from "./xlsconfigs";
 import {IndexedObject} from "../../nnt/core/kernel";
+import {util} from "protobufjs";
+import float = util.float;
 
 @model([auth])
 export class QueryUserVipInfo {
@@ -163,6 +167,7 @@ export class ItemRecord {
     @colinteger()
     type: number;
 }
+
 
 
 @model([auth])
@@ -351,8 +356,23 @@ export class MinAppShare{
     @integer(3,[input],"二维码高度")
     width:number;
 
+    @string(5,[input],"平台信息")
+    channel:string;
+
+    @string(7,[input],"用户id")
     uid:string;
 
     @string(4,[output])
     url:string;
+
+    @string(8,[output])
+    fileName:string;
+}
+@model()
+export class ItemQuery{
+    @integer(1,[input])
+    itemId:number;
+
+    @double(2,[output])
+    stock:number;
 }

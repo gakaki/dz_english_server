@@ -205,3 +205,10 @@ export class UserPackRecord{
     @type(2,ReceivePackage,[output],"收到的红包")
     receivePackages:ReceivePackage;
 }
+
+@model()
+export class Acceleration{
+
+    @integer(1,[output])
+    num:number;
+}

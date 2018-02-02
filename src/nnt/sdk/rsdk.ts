@@ -101,7 +101,7 @@ export class RSdk implements IRouter {
         let m: Login = trans.model;
         trans.timeout(20);
 
-        let rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), m.uid);
+        let rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), {userid:m.uid});
         if (!rcd) {
             trans.status = STATUS.TARGET_NOT_FOUND;
             trans.submit();
@@ -123,7 +123,7 @@ export class RSdk implements IRouter {
         let m: CheckExpire = trans.model;
         trans.timeout(20);
 
-        let rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), m.uid);
+        let rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo),{userid:m.uid});
         if (!rcd) {
             trans.status = STATUS.TARGET_NOT_FOUND;
             trans.submit();
@@ -144,7 +144,7 @@ export class RSdk implements IRouter {
 
         let rcd: SdkUserInfo;
         if (m.uid) {
-            rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), m.uid);
+            rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo),{userid:m.uid});
             if (!rcd) {
                 trans.status = STATUS.TARGET_NOT_FOUND;
                 trans.submit();
@@ -173,7 +173,7 @@ export class RSdk implements IRouter {
     async share(trans: Transaction) {
         let m: Share = trans.model;
 
-        let rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), m.uid);
+        let rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), {userid:m.uid});
         if (!rcd) {
             trans.status = STATUS.TARGET_NOT_FOUND;
             trans.submit();
@@ -194,20 +194,21 @@ export class RSdk implements IRouter {
     async minappshare(trans:Transaction){
         let m:MinAppShare = trans.model;
 
-        let rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), m.uid);
+        let rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), {userid:m.uid});
         if (!rcd) {
             trans.status = STATUS.TARGET_NOT_FOUND;
             trans.submit();
             return;
         }
+
         let chann = this._sdk.channel(rcd.channel);
-        if (!await chann.doMinAppShare(m, rcd)) {
+        m=await chann.doMinAppShare(m, rcd);
+        if (!m.url || !m.fileName) {
             trans.status = STATUS.THIRD_FAILED;
             trans.submit();
             return;
         }
 
-        m.url="1234";
         trans.submit();
 
 
@@ -228,7 +229,7 @@ export class RSdk implements IRouter {
 
         let rcd: SdkUserInfo;
         if (m.uid) {
-            rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), m.uid);
+            rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), {userid:m.uid});
             if (!rcd) {
                 trans.status = STATUS.TARGET_NOT_FOUND;
                 trans.submit();
@@ -288,7 +289,7 @@ export class RSdk implements IRouter {
 
         let rcd: SdkUserInfo;
         if (m.uid) {
-            rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), m.uid);
+            rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), {userid:m.uid});
             if (!rcd) {
                 trans.status = STATUS.TARGET_NOT_FOUND;
                 trans.submit();
@@ -317,7 +318,7 @@ export class RSdk implements IRouter {
 
         let rcd: SdkUserInfo;
         if (m.uid) {
-            rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), m.uid);
+            rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), {userid:m.uid});
             if (!rcd) {
                 trans.status = STATUS.TARGET_NOT_FOUND;
                 trans.submit();
@@ -346,7 +347,7 @@ export class RSdk implements IRouter {
 
         let rcd: SdkUserInfo;
         if (m.uid) {
-            rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), m.uid);
+            rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), {userid:m.uid});
             if (!rcd) {
                 trans.status = STATUS.TARGET_NOT_FOUND;
                 trans.submit();

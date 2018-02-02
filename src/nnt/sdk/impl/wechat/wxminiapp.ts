@@ -27,6 +27,8 @@ import {MediaSupport} from "../../../server/mediastore";
 import {S2SWechatTicket, S2SWechatToken} from "./s2smodel";
 import {ACROOT} from "../../../acl/acl";
 import {MinAppShare} from "../../../../app/model/user";
+import * as fs from "fs";
+import {User} from "../../../../app/router/user";
 
 export class WxMiniApp extends Channel {
 
@@ -415,11 +417,28 @@ export class WxMiniApp extends Channel {
         wechatGetWxaCode.page=m.page;
         wechatGetWxaCode.width=m.width;
         let result = await RestSession.Get(wechatGetWxaCode);
-        if (!result) {
-            console.log(result);
-            return false;
+        console.log(result);
+        let localData=new Date().toLocaleDateString();
+        let firstPth="./"+m.uid;
+        let secondPath="./"+m.uid+localData+"/";
+        try{
+            if(!await fs.existsSync(firstPth)){
+                await fs.mkdirSync(firstPth);
+            }
+            if(!await fs.existsSync(secondPath)){
+                //每日首次分享
+
+                await fs.mkdirSync(secondPath);
+            }
+            let fileName=new Date().getTime()+".jpg";
+            await fs.writeFileSync(secondPath+fileName, result);
+            m.url =secondPath;
+            m.fileName=fileName;
+        }catch (err){
+            logger.warn("文件或二维码创建失败"+err);
         }
-        return true;
+
+        return m;
     }
 
     async doPay(m: Pay, ui: SdkUserInfo, trans: Transaction): Promise<boolean> {
