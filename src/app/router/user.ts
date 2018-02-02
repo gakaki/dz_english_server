@@ -24,6 +24,7 @@ import {AbstractCronTask, CronAdd, PerDay} from "../../nnt/manager/crons";
 import {Auth, SdkUserInfo} from "../../nnt/sdk/msdk";
 import {REGEX_PHONE} from "../../nnt/component/pattern";
 import {configs} from "../model/xlsconfigs";
+import {LoginMethod} from "../../nnt/sdk/client/src/service";
 
 export class User implements IRouter {
     action: string = "user";
@@ -52,7 +53,7 @@ export class User implements IRouter {
         let sdkAuth = new Auth();
         sdkAuth.payload = m.payload;
         sdkAuth.channel = 'wxminiapp';
-        sdkAuth.method=m.payload.login;
+        sdkAuth.method=LoginMethod.WECHAT_MINI_APP;
 
         console.log("准备发送的数据");
         console.log(sdkAuth);
