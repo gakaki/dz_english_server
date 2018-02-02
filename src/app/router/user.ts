@@ -134,16 +134,16 @@ export class User implements IRouter {
                     m.inviterpid,
                 );
                 logger.info("使用第三方凭据注册账号 " + ui.pid);
+            }else{
+                //更新一次userInfo
+                console.log("用户更新");
+                console.log(trans.current.pid);
+                await Update(UserInfo, null, [{pid: trans.current.pid}, {$set: {nickName: m.info.nickName, avatarUrl: m.info.avatarUrl}}]);
             }
             console.log(ui);
 
         }
-        else {
-            //更新一次userInfo
-            console.log("用户更新");
-            console.log(trans.current.pid);
-            await Update(UserInfo, null, [{pid: trans.current.pid}, {$set: {nickName: m.info.nickName, avatarUrl: m.info.avatarUrl}}]);
-        }
+
 
         if (!ui) {
             trans.status = Code.LOGIN_FAILED;
@@ -193,7 +193,6 @@ export class User implements IRouter {
 
         m.sid = ses.sid;
         m.info=ui;
-        console.log("登陆能成功吗？？？？")
         logger.log("{{=it.user}}@{{=it.sid}} 登陆成功", {user: m.info.pid, sid: m.sid});
 
         // 日志
