@@ -297,7 +297,7 @@
         {
           "in": "../h5group/design/小程序/配置表/",
           "server": "~/src/app/model/xlsconfigs.ts",
-          "client": "../webapp/src/api/configs.ts"
+          "client": "../guessNumClient/utils/configs.ts"
         }
       ],
       "gendb": [

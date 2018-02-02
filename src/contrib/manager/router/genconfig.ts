@@ -7,6 +7,8 @@ import {logger} from "../../../nnt/core/logger";
 import {expand} from "../../../nnt/core/url";
 import {AsyncQueue} from "../../../nnt/core/operation";
 import {static_cast} from "../../../nnt/core/core";
+let shell = require('shelljs');
+
 
 /*
 * 生成的是完整的ts代码，包含定义以及数据段
@@ -291,6 +293,15 @@ export function GenConfig(cfg: ConfigCfg) {
                 let outfile = expand(cfg.client);
                 fs.writeFileSync(outfile, out);
 
+                //转成js格式
+                if (shell.exec(`tsc -t es2015 ${outfile}`).code !== 0) {
+                    shell.echo('客户端转表失败');
+                    shell.exit(1);
+                }
+                else {
+                    shell.rm(outfile);
+                    logger.log('转表完成，请到客户端项目下，手动提交config.js');
+                }
                 next();
             });
         })
