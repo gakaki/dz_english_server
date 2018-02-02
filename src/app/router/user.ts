@@ -101,6 +101,9 @@ export class User implements IRouter {
         let ui: UserInfo;
 
         // 第三方登陆
+        console.log("第三方登陆");
+        console.log(m.uid);
+        console.log("当前时间"+new Date().toLocaleString());
         if (m.uid) {
             // 直接通过uid来查找账号，找到后生成对应sid
             let sdkui = await Query(make_tuple(SdkUserInfo, "kv.sdk_users"), {userid:m.uid});
