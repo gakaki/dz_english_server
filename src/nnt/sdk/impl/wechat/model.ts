@@ -3,12 +3,11 @@ import {
     array, double, input, integer, json, model, optional, output, string, string_t,
     type
 } from "../../../core/proto";
-import {Base, HttpMethod, IResponseData, RequestParams} from "../../../session/model";
+import {Base, HttpContentType, HttpMethod, IResponseData, RequestParams} from "../../../session/model";
 import {logger} from "../../../core/logger";
 import {colarray, coldouble, colinteger, colstring, table} from "../../../store/proto";
-import {PaytoUser, SdkUserInfo, Support} from "../../msdk";
-import {DateTime} from "../../../core/time";
-import {any} from "async";
+import {SdkUserInfo, Support} from "../../msdk";
+
 
 export enum AuthType {
     PUB = 1, // 公众号授权
@@ -262,6 +261,7 @@ export class WechatGetWxaCode extends Base{
     constructor() {
         super();
         this.method = HttpMethod.POST;
+        this.requestType=HttpContentType.JSON;
     }
 
     requestUrl(): string {
@@ -276,6 +276,7 @@ export class WechatGetWxaCode extends Base{
         };
         return rp;
     }
+
     @string(1,[input])
     @colstring()
     scene:string;

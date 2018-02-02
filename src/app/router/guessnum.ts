@@ -25,7 +25,10 @@ export class Guessnum implements IRouter {
     @action(PackInfo)
     async sendpack(trans: Trans){
         let m: PackInfo = trans.model;
+        console.log(trans.sid);
+
         let ui:UserInfo=await User.FindUserBySid(trans.sid);
+        console.log(ui);
         if(ui==null){
             trans.status = Code.USER_NOT_FOUND;
             trans.submit();
