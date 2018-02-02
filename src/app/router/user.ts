@@ -99,7 +99,10 @@ export class User implements IRouter {
         // 第三方登陆
         if (m.uid) {
             // 直接通过uid来查找账号，找到后生成对应sid
-            let sdkui = await Query(make_tuple(SdkUserInfo, "kv.sdk_users"), m.uid);
+            let sdkui = await Query(make_tuple(SdkUserInfo, "kv.sdk_users"), {userid:m.uid});
+
+
+
             if (!sdkui) {
                 trans.status = Code.LOGIN_FAILED;
                 logger.warn("尝试无效的第三方登陆");
