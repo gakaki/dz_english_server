@@ -154,7 +154,9 @@ export class WxMiniApp extends Channel {
         //之后在router/user.ts的login里完成登录、注册或更新用户信息、返回sid；
         //下次登录直接用sid登录，sid会自动续期
 
-        logger.info("拿到的数据"+m);
+        logger.info("我要进行微信授权登陆");
+        console.log(m);
+
         if (m.payload && m.payload.code) {
             let authcode = m.payload.code;
             let appid = this.appid;

@@ -54,10 +54,13 @@ export class User implements IRouter {
         sdkAuth.channel = 'wxminiapp';
         sdkAuth.method=m.payload.login;
 
+        console.log("准备发送的数据");
+        console.log(sdkAuth);
+
         let r =await Call('sdk', 'sdk.auth', sdkAuth);
 
         console.log("拿到的数据+++++++++++++++++++"+r.model);
-        if (r.model.uid) {
+        if (r.model) {
             m.uid = r.model.uid;
         }
         else {
