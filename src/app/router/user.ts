@@ -137,8 +137,8 @@ export class User implements IRouter {
             }else{
                 //更新一次userInfo
                 console.log("用户更新");
-                console.log(trans.current.pid);
-                await Update(UserInfo, null, [{pid: trans.current.pid}, {$set: {nickName: m.info.nickName, avatarUrl: m.info.avatarUrl}}]);
+                console.log(ui.pid);
+                await Update(UserInfo, null, [{pid: ui.pid}, {$set: {nickName: m.info.nickName, avatarUrl: m.info.avatarUrl}}]);
             }
             console.log(ui);
 
