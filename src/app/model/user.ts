@@ -388,3 +388,15 @@ export class ItemQuery{
     @double(2,[output])
     stock:number;
 }
+
+@model()
+export class AddItem{
+    @integer(1,[input])
+    itemId:number;
+
+    @double(2,[input])
+    num:number;
+
+    @string(3,[input])
+    uid:string
+}
