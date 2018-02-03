@@ -337,14 +337,22 @@ export class Guessnum implements IRouter {
        let receivePackage:ReceivePackage = new ReceivePackage();
 
        let p= await Guessnum.getPackSumByUid(ui.uid);
-        sendPackage.sum=p.sum;
+       if(p == null){
+           sendPackage.sum=0;
+       }else{
+           sendPackage.sum=p.sum;
+       }
+
        sendPackage.num=await Guessnum.getPackCountByUid(ui.uid);
        sendPackage.record=await Guessnum.getPacksByUid(ui.uid);
 
        let r =await Guessnum.getReceivePackageRecordsMoneyByUid(ui.uid);
-        console.log("查询到的信息");
-        console.log(r);
-        receivePackage.sum=r.moneyGot;
+       if(r == null){
+           receivePackage.sum=0;
+       }else{
+           receivePackage.sum=r.moneyGot;
+       }
+
        receivePackage.num=await Guessnum.getReceivePackageRecordsCountByUid(ui.uid);
        receivePackage.record=await Guessnum.getReceivePackageRecordsByUid(ui.uid);
 
@@ -458,7 +466,12 @@ export class Guessnum implements IRouter {
             $limit:1,
         });
         console.log(r);
-        return  r[0]
+        if(r &&r.length>0){
+            return  r[0]
+        }else{
+            return null;
+        }
+
     }
 
     protected static async saveUserGuessRecord(uid:string,userAnswerWord:string,userGetMoney:number,userMark:string,pid:number,commit:string){
@@ -551,7 +564,12 @@ export class Guessnum implements IRouter {
         });
         console.log("获取的总金额");
         console.log(r);
-        return r[0];
+        if(r && r.length>0){
+            return r[0];
+        }else{
+            return null;
+        }
+
     }
 
 
