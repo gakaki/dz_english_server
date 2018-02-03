@@ -168,7 +168,7 @@ export class Guessnum implements IRouter {
            case 1:
                let cfgA= configs.Distribution.Get(1);
                if(pack.A){
-                   probability = Random.Rangef(cfgAA.min,cfgAA.max);
+                   probability = Random.Rangef(cfgA.min,cfgA.max);
                }else{
                    probability = Random.Rangef(cfgA.firstmin,cfgA.firstmax);
                    pack.A=true;
