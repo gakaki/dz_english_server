@@ -300,6 +300,7 @@ export class Pay {
     @json(9, [output], "客户端发起支付需要的数据")
     @coljson()
     payload: IndexedObject;
+
 }
 
 // 准备环境数据
@@ -430,6 +431,7 @@ export class Withdraw {
 
     @double(3, [input], '提现金额/元')
     money: number;
+
 
     @json(9, [output], "客户端发起支付需要的数据")
     @coljson()

@@ -364,7 +364,6 @@ export class RSdk implements IRouter {
                 return;
             }
         }
-
         trans.timeout(20);
 
         let chann = this._sdk.channel(m.channel);

@@ -217,7 +217,8 @@ export class User implements IRouter {
        let payInfo:RechargeRecord = new RechargeRecord();
        payInfo.price = m.payCount;
        payInfo.time = DateTime.Current();
-       payInfo.pid = "123";
+       payInfo.pid=ui.uid;
+      // payInfo.pid = "123";
        payInfo.type = "recharge";
        let t = await Call(srv.sdksrv, "sdk.payorderid", trans.params);
 
@@ -267,10 +268,11 @@ export class User implements IRouter {
        withdraw.money = m.money;
        withdraw.channel="wxminiapp";
        withdraw.uid=ui.uid;
+       //withdraw.uid="123";
 
        let a=await  Call("sdk", 'sdk.withdraw', withdraw);
        console.log(a);
-       m.data=a.model.data
+       m.data=a.model.data;
        trans.submit();
    }
 

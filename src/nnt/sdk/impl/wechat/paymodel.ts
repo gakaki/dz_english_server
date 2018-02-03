@@ -18,6 +18,8 @@ export abstract class WechatPayModel extends Base {
     requestParams(): RequestParams {
         let rp = super.requestParams();
         rp.root = "xml";
+        console.log("--------------------------------------------");
+        console.log(rp);
         return rp;
     }
 
@@ -278,18 +280,22 @@ export class WechatPayResult {
 @model()
 @table('', 'wx_pay_to_user')
 export class WxappPaytoUser extends WechatPayModel{
+    constructor() {
+        super();
+        this.method = HttpMethod.POST;
+    }
 
     @double(3, [input], "钱数")
     @coldouble()
-    money: number;
+    amount: number;
 
     @string(1, [input], "微信开放平台审核通过的应用APPID")
     @colstring()
-    appid: string;
+    mch_appid: string;
 
     @string(2, [input], "微信支付分配的商户号")
     @colstring()
-    mch_id: string;
+    mchid: string;
 
     @string(3, [input, optional], "终端设备号(门店号或收银设备ID)，默认请传\"WEB\"")
     @colstring()
@@ -313,7 +319,7 @@ export class WxappPaytoUser extends WechatPayModel{
 
     @string(10, [input], "商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*@ ，且在同一个商户号下唯一")
     @colstring()
-    out_trade_no: string;
+    partner_trade_no: string;
 
     @string(23, [input, optional], "trade_type=JSAPI时（即公众号支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识")
     @colstring()
@@ -328,42 +334,15 @@ export class WxappPaytoUser extends WechatPayModel{
     // 微信后台配置的key
     signkey: string;
 
-    srv_ip: string;
+    @string(24, [input], "调用接口的机器Ip地址")
+    @colstring()
+    spbill_create_ip: string;
 
+    @string(25,[input])
+    @colstring()
+    check_name:string;
     requestUrl(): string {
         return "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
     }
 
-    parseData(resp: IResponseData, suc: () => void, error: (err: Error) => void) {
-        let data = resp.data;
-        if (data.errcode) {
-            resp.code = -data.errcode;
-            resp.data = null;
-            resp.message = data.errmsg;
-            logger.warn("微信：" + resp.message);
-        }
-        else {
-            resp.code = 0;
-            resp.data = data;
-        }
-        super.parseData(resp, suc, error);
-    }
-
-    requestParams(): RequestParams {
-        let rp = new RequestParams();
-        rp.fields = {
-            mch_appid: this.appid,
-            mchid: this.mch_id,
-            device_info: this.device_info,
-            nonce_str: this.nonce_str,
-            sign: this.sign,
-            partner_trade_no: this.out_trade_no,
-            openid: this.openid,
-            check_name: 'NO_CHECK',
-            amount: this.money,
-            desc: this.desc,
-            spbill_create_ip: this.srv_ip
-        };
-        return rp;
-    }
 }

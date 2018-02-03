@@ -495,6 +495,7 @@ export class WxMiniApp extends Channel {
 
         // 计算签名
         let fields = ObjectT.ToMap(Encode(wuo));
+
         wuo.sign = this.doSignaturePay(fields, wuo.signkey);
         wuo.created = DateTime.Now();
 
@@ -507,6 +508,16 @@ export class WxMiniApp extends Channel {
 
         // 微信的每种方式产生的payload格式是不一样的
         if (m.method == PayMethod.WECHAT_PUB) {
+            m.payload = {
+                appId: this.pubid,
+                timeStamp: DateTime.Current().toString(),
+                nonceStr: NonceAlDig(10),
+                package: "prepay_id=" + res.prepay_id,
+                signType: "MD5"
+            };
+            fields = ObjectT.ToMap(m.payload);
+            m.payload.paySign = this.doSignaturePay(fields, wuo.signkey);
+        }else if(m.method == PayMethod.WECHAT_MINAPP){
             m.payload = {
                 appId: this.pubid,
                 timeStamp: DateTime.Current().toString(),
@@ -550,7 +561,7 @@ export class WxMiniApp extends Channel {
     }
 
     genWithdrawTradeNO(uid:string): string {
-        return `withdraw_${uid}_${DateTime.Current()}`
+        return `withdraw${uid}${DateTime.Current()}`
     }
 
     async doWithdraw(m: Withdraw, ui: SdkUserInfo): Promise<boolean> {
@@ -558,14 +569,17 @@ export class WxMiniApp extends Channel {
         wtd.nonce_str = NonceAlDig(10);
 
         //sign
-        wtd.out_trade_no = this.genWithdrawTradeNO(m.uid);
-        wtd.money = m.money; // 正式的价格
-        wtd.srv_ip = getServerIp();
-        wtd.appid = this.appid;
-        wtd.mch_id = this.pubmchid;
+        wtd.partner_trade_no = this.genWithdrawTradeNO(m.uid);
+        wtd.amount = m.money*100; // 正式的价格
+        wtd.spbill_create_ip = getServerIp();
+        //wtd.spbill_create_ip = "192.168.0.1";
+        wtd.mch_appid = this.appid;
+        wtd.mchid = this.pubmchid;
         wtd.signkey = this.pubkey;
+        wtd.check_name="NO_CHECK";
         wtd.openid = ui.userid;
-       
+        //wtd.openid = "oQq-J5XuO2NawkxByfpkMrOAPmLg";
+
 
         // 计算签名
         let fields = ObjectT.ToMap(Encode(wtd));
