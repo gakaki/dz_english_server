@@ -197,13 +197,28 @@ export class Guessnum implements IRouter {
 
 
        m.mark=A+"A"+B+"B";
+        m.markId=Guessnum.getMarkId(m.mark);
+        let cid=Random.Rangei(1,4);
+        switch (cid){
+            case 1:
+                m.commit=configs.Evaluate.Get(Number(m.markId)).iqwored1;
+                break;
+            case 2:
+                m.commit=configs.Evaluate.Get(Number(m.markId)).iqwored2;
+                break;
+            case 3:
+                m.commit=configs.Evaluate.Get(Number(m.markId)).iqwored3;
+                break;
+        }
+
        pack.remain -= m.moneyGeted;
+       pack.remain=Number(pack.remain.toFixed(2));
         pack.CDList[trans.sid] = new Date().getTime();
         pack.guessCount -= 1;
         await Guessnum.updatePack(pack);
         console.log("结束");
         console.log(pack.CDList);
-        await Guessnum.saveUserGuessRecord(ui.uid,m.guessNum,m.moneyGeted,m.mark,m.pid);
+        await Guessnum.saveUserGuessRecord(ui.uid,m.guessNum,m.moneyGeted,m.mark,m.pid,m.commit);
 
         let delta = new Delta();
         delta.addkv(configs.Item.MONEY,m.moneyGeted);
@@ -327,7 +342,9 @@ export class Guessnum implements IRouter {
        sendPackage.record=await Guessnum.getPacksByUid(ui.uid);
 
        let r =await Guessnum.getReceivePackageRecordsMoneyByUid(ui.uid);
-       receivePackage.sum=r.moneyGot;
+        console.log("查询到的信息");
+        console.log(r);
+        receivePackage.sum=r.moneyGot;
        receivePackage.num=await Guessnum.getReceivePackageRecordsCountByUid(ui.uid);
        receivePackage.record=await Guessnum.getReceivePackageRecordsByUid(ui.uid);
 
@@ -444,14 +461,15 @@ export class Guessnum implements IRouter {
         return  r[0]
     }
 
-    protected static async saveUserGuessRecord(uid:string,userAnswerWord:string,userGetMoney:number,userMark:string,pid:number){
+    protected static async saveUserGuessRecord(uid:string,userAnswerWord:string,userGetMoney:number,userMark:string,pid:number,commit:string){
         await Insert(PackGuessRecord,{
             uid:uid,
             pid:pid,
             userAnswerWord:userAnswerWord,
             userGetMoney:userGetMoney,
             userMark:userMark,
-            createTime:new Date().toLocaleString()
+            createTime:new Date().toLocaleString(),
+            commit:commit
         })
     }
 
@@ -479,29 +497,32 @@ export class Guessnum implements IRouter {
             rankInfo.moneyGot=record.moneyGot;
             let records:Array<PackGuessRecord>=await QueryAll(PackGuessRecord,{pid:pid,uid:record._id});
             rankInfo.guessRecords=records;
-            rankInfo.maxMarkId=Guessnum.getMaxGuessRecord(records);
+            rankInfo.maxRecord=Guessnum.getMaxGuessRecord(records);
             rankInfos.push(rankInfo);
         }
 
         return rankInfos;
     }
 
-    protected static getMaxGuessRecord(records:Array<PackGuessRecord>):string{
+    protected static getMaxGuessRecord(records:Array<PackGuessRecord>){
         let recordsSort=records.sort(function(object1:PackGuessRecord, object2:PackGuessRecord) {
             let value1 = object1["userMark"];
             let value2 = object2["userMark"];
             return value2.localeCompare(value1);
         });
-        let cf=configs.evaluates;
-        let maxRecord=recordsSort[0];
-        console.log(maxRecord);
-        for(let i of cf){
+
+        return recordsSort[0];
+        //return "1"
+    }
+
+    protected static getMarkId(mark:string){
+        for(let i of configs.evaluates){
             //console.log(i);
-            if(i[1]==maxRecord.userMark){
+            if(i[1]==mark){
                 return i[0];
             }
         }
-        //return "1"
+        return 0;
     }
 
     protected static async getReceivePackageRecordsCountByUid(uid:string){
