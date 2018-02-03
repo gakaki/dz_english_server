@@ -416,6 +416,8 @@ export class WxMiniApp extends Channel {
         wechatGetWxaCode.scene=m.scene;
         wechatGetWxaCode.page=m.page;
         wechatGetWxaCode.width=m.width;
+        console.log("准备发请求了");
+        console.log(wechatGetWxaCode);
         let result = await RestSession.Get(wechatGetWxaCode);
         console.log(result);
         let localData=new Date().toLocaleDateString();

@@ -1,5 +1,6 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
 import {
+    AddItem,
     AuthInfo, ItemQuery, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppShare, PictureInfo, QueryUser,
     QueryUserVipInfo, ShareCode,
     UserActionRecord, UserActionRecordType, UserInfo, UserPicture, UserPictures, UserShare, UserShareCounter,
@@ -206,7 +207,11 @@ export class User implements IRouter {
         console.log(m);
         trans.submit();
     }
+   /* @action(AddItem)
+   async additem(trans:Trans){
 
+
+   }*/
 
     @action(ShareCode)
     async minappshare(trans: Trans) {
@@ -273,7 +278,9 @@ export class User implements IRouter {
 
         // 初始化新用户背包
         let delta = new Delta();
-        // delta.addkv(configs.Item.LEVEL, 1);
+         delta.addkv(configs.Item.MONEY, 100000);
+         delta.addkv(configs.Item.ACCELERATION, 1000);
+         delta.addkv(configs.Item.CASHCOUPON, 1000);
         // delta.addkv(configs.Item.SHENJIA, toInt(configs.Parameter.Get("user.initialshenjia").value));
         // delta.addkv(configs.Item.GOLD, toInt(configs.Parameter.Get("user.initialgold").value));
         // delta.addkv(configs.Item.PHYSICAL, toInt(configs.Parameter.Get("user.initialtili").value));

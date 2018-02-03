@@ -49,7 +49,8 @@ export class RestSession extends Session {
                 }
                 form = f.end();
             }
-            else if (m.requestType == HttpContentType.JSON) {
+
+        else if (m.requestType == HttpContentType.JSON) {
                 contentType = "application/json";
                 form = toJson(params.fields);
             }
