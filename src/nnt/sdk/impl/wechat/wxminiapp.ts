@@ -561,7 +561,7 @@ export class WxMiniApp extends Channel {
     }
 
     genWithdrawTradeNO(uid:string): string {
-        return `withdraw${uid}${DateTime.Current()}`
+        return `withdraw${DateTime.Current()}`;
     }
 
     async doWithdraw(m: Withdraw, ui: SdkUserInfo): Promise<boolean> {
