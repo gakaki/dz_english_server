@@ -14,6 +14,8 @@ import {Aggregate, Count, Insert, Query, QueryAll, Update} from "../../nnt/manag
 import {DateTime} from "../../nnt/core/time";
 import {configs} from "../model/xlsconfigs";
 import {Delta} from "../model/item";
+import {Acquire} from "../../nnt/server/mq";
+import {AppConfig} from "../model/appconfig";
 
 
 
@@ -35,37 +37,47 @@ export class Guessnum implements IRouter {
         }
        m.userInfo=ui;
 
-        let delta = new Delta();
-        if(ui.itemCount(configs.Item.MONEY)<m.money){
-            trans.status = Code.NEED_ITEMS;
+        //计算扣除
+        let cost = new Delta();
+        if (m.useTicket) {
+            if(ui.itemCount(configs.Item.CASHCOUPON)<0){
+                trans.status=Code.NEED_COUPON;
+                trans.submit();
+                return;
+            }
+            m.money--;//代金券抵1元
+            //扣代金券
+            cost.addkv(configs.Item.CASHCOUPON, 1);
+        }
+        //扣钱数
+        cost.addkv(configs.Item.MONEY, m.money);
+
+        let need = Delta.NeedItems(cost.items, ui.items);
+        //钱数不足，客户端根据错误码跳支付
+        if (need.size) {
+            trans.status = Code.NEED_MONEY;
+            m.needmoney = m.money;
             trans.submit();
             return;
         }
 
-        delta.addkv(configs.Item.MONEY,m.money * -1);
-       await User.ApplyDelta(ui,delta);
-       if(m.useTicket){
-           if(ui.itemCount(configs.Item.CASHCOUPON)<0){
-               trans.status=Code.NEED_ITEMS;
-               trans.submit();
-               return;
-           }
-           delta.addkv(configs.Item.CASHCOUPON,-1);
-           await User.ApplyDelta(ui,delta);
-       }
+        //钱数OK,
+        let pid = DateTime.Current();
+        //创建消息通道
+        await Acquire(AppConfig.MQSRV).open("pack." + m.pid, {transmitter: true});
 
+        //生成红包
 
-       let psw =Guessnum.getPack();
-       let pss="";
-       for(let i of psw){
-           pss += i;
-       }
-       m.password=pss;
-        let pack=await Guessnum.savePack(m);
-        m.remain=pack.remain;
-        m.pid=pack.pid;
-        m.createTime=pack.createTime;
-        m.status=pack.status;
+        //应用扣除
+        User.ApplyDelta(ui, cost);
+        //存库
+        m.pid = DateTime.Current();
+        m.createTime = Date.now() + '';
+        m.password = Guessnum.getCode();
+        m.remain = m.money;
+        m.status = Code.PACK_Fighing;
+        await Insert(PackInfo, m);
+
         trans.submit();
     }
     //竞猜数字
@@ -376,18 +388,12 @@ export class Guessnum implements IRouter {
        trans.submit();
    }
 
-    protected static getPack(){
+    protected static getCode(){
         let psw=new Set();
-        return getPsw(psw);
-        function getPsw(setList:Set<string>):Set<string>{
-            if(setList.size<4){
-                let p=Random.Rangei(0,9,true);
-                setList.add(p.toString());
-                return getPsw(setList);
-            }else{
-                return setList;
-            }
+        while (psw.size < 4) {
+            psw.add(Random.Rangei(0, 0, true))
         }
+        return Array.from(psw).join('');
     }
 
     protected static guessCompare(guessNum:string,answer:string){
@@ -412,9 +418,9 @@ export class Guessnum implements IRouter {
         };
     }
 
-    protected static async savePack(pack:PackInfo):Promise<PackInfo>{
+    protected static async savePack(pack:PackInfo, pid:string):Promise<PackInfo>{
         return await Insert(PackInfo, {
-            pid: DateTime.Current(),
+            pid: pid,
             uid:pack.userInfo.uid,
             title:pack.title,
             //uid:"123",

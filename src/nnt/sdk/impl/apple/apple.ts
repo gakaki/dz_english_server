@@ -111,7 +111,7 @@ export class Apple extends Channel {
     }
 
     async doWithdraw(m: Withdraw, ui: SdkUserInfo): Promise<boolean> {
-
+        return true;
     }
 }
 

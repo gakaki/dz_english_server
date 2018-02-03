@@ -20,6 +20,9 @@ export class PackInfo {
     @coldouble()
     money: number;
 
+    @double(3, [output], "缺少钱数")
+    needmoney: number;
+
     @double(9,[output],"剩余金额")
     @coldouble()
     remain:number;
@@ -34,7 +37,6 @@ export class PackInfo {
     @colstring()
     createTime:string;
 
-    @string(5,[output],"数字密码")
     @colstring()
     password:string;
 
