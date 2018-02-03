@@ -325,6 +325,7 @@ export class Guessnum implements IRouter {
         }
         pack.userInfo=await User.FindUserInfoByUid(pack.uid);
         m.packInfo=pack;
+        m.answer=pack.password;
         let result=await Guessnum.getPackRankingList(m.pid);
         //console.log(result);
 

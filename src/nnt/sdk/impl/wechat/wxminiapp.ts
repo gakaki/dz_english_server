@@ -482,7 +482,7 @@ export class WxMiniApp extends Channel {
             wuo.appid=this.appid;
             wuo.mch_id=this.pubmchid;
             wuo.signkey = this.pubkey;
-            wuo.openid = "oQq-J5UKHBbCwbqonVZm7uhJpNIM";
+            wuo.openid = m.uid;
             wuo.trade_type="JSAPI"
         }
         else {

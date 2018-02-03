@@ -187,6 +187,9 @@ export class PackRankingList{
     @integer(1,[input],"红包id")
     pid:number;
 
+    @string(4,[output],"红包口令答案")
+    answer:string;
+
     @type(2,PackInfo,[output],"红包信息")
     packInfo:PackInfo;
 

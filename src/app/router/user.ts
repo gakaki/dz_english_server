@@ -23,7 +23,7 @@ import {logger} from "../../nnt/core/logger";
 import {UserBriefInfo, UserVipInfo} from "../model/common";
 import {IApiServer} from "../../nnt/server/apiserver";
 import {AbstractCronTask, CronAdd, PerDay} from "../../nnt/manager/crons";
-import {Auth, LoginMethod, Pay, PayMethod, SdkPayOrderId, SdkUserInfo} from "../../nnt/sdk/msdk";
+import {Auth, LoginMethod, Pay, PayMethod, SdkPayOrderId, SdkUserInfo, Withdraw} from "../../nnt/sdk/msdk";
 import {REGEX_PHONE} from "../../nnt/component/pattern";
 import {configs} from "../model/xlsconfigs";
 import {Api} from "../server/api";
@@ -243,9 +243,20 @@ export class User implements IRouter {
 
        let a=await  Call("sdk", 'sdk.pay', pay);
 
+       if(a.status != 0){
+           trans.status=STATUS.THIRD_FAILED;
+           trans.submit();
+           return
+       }
+       m.payload=a.model.payload;
        console.log(a);
-
        trans.submit();
+   }
+
+   async minappwithdraw(trans:Trans){
+       let withdraw:Withdraw = new Withdraw();
+
+       let a=await  Call("sdk", 'sdk.withdraw', withdraw);
    }
 
     @action(ShareCode)
