@@ -478,6 +478,13 @@ export class WxMiniApp extends Channel {
         else if (m.method == PayMethod.WECHAT_H5) {
             wuo.trade_type = "MWEB";
         }
+        else if(m.method == PayMethod.WECHAT_MINAPP){
+            wuo.appid=this.appid;
+            wuo.mch_id=this.pubmchid;
+            wuo.signkey = this.pubkey;
+            wuo.openid = "oQq-J5UKHBbCwbqonVZm7uhJpNIM";
+            wuo.trade_type="JSAPI"
+        }
         else {
             wuo.appid = this.payid;
             wuo.mch_id = this.paymchid;

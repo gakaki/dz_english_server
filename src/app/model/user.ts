@@ -388,15 +388,11 @@ export class ItemQuery{
     @double(2,[output])
     stock:number;
 }
-
 @model()
-export class AddItem{
-    @integer(1,[input])
-    itemId:number;
+export class MinAppPay{
 
-    @double(2,[input])
-    num:number;
+    @double(1,[input,output],"交易金额")
+    payCount:number;
 
-    @string(3,[input])
-    uid:string
+
 }

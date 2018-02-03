@@ -71,14 +71,30 @@ export class KvRedis extends AbstractKv {
             hdl.on('ready', () => {
                 logger.info("连接 {{=it.id}}@redis", {id: this.id});
                 this._hdl = hdl;
+                hdl.publish('packExpired',"The red packet has expired");
                 resolve();
             });
+            hdl.on("subscribe",(channel:string,count:number,message:string)=>{
+                console.log("channel:" + channel + ", count:"+count+",message"+message);
+            })
         });
+
     }
 
     async close(): Promise<void> {
         this._hdl.end(true);
         this._hdl = null;
+    }
+
+    expired(key:string,time:number, cb: (res: Variant) => void){
+        this._hdl.expire(key,time,(err:Error,res:any)=>{
+            if (err) {
+                logger.error(err);
+                cb(null);
+                return;
+            }
+            cb(Variant.Unserialize(res));
+        })
     }
 
     get(key: string, cb: (res: Variant) => void) {
@@ -275,4 +291,6 @@ export class KvRedis extends AbstractKv {
             }
         });
     }
+
+
 }

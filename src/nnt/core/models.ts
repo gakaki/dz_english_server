@@ -223,7 +223,7 @@ export class PayOrder {
     time: number; // 下单时间
 
     @colinteger()
-    @string(2, [output], "价格")
+    @string(2, [input,output,optional], "价格")
     price: number; // 价格
 
     @colstring()

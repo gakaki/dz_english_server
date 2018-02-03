@@ -336,40 +336,40 @@ export class Guessnum implements IRouter {
     @action(UserPackRecord)
     async getuserpackrecords(trans:Trans){
         let m:UserPackRecord = trans.model;
-           let ui:UserInfo=await User.FindUserBySid(trans.sid);
-       if(ui==null){
-           trans.status = Code.USER_NOT_FOUND;
-           trans.submit();
-           return
-       }
-       let sendPackage:SendPackage = new SendPackage();
-       let receivePackage:ReceivePackage = new ReceivePackage();
+        let ui:UserInfo=await User.FindUserBySid(trans.sid);
+        if(ui==null){
+            trans.status = Code.USER_NOT_FOUND;
+            trans.submit();
+            return
+        }
+        let sendPackage:SendPackage = new SendPackage();
+        let receivePackage:ReceivePackage = new ReceivePackage();
 
-       let p= await Guessnum.getPackSumByUid(ui.uid);
-       if(p == null){
-           sendPackage.sum=0;
-       }else{
-           sendPackage.sum=Number((p.sum).toFixed(2));
-       }
+        let p= await Guessnum.getPackSumByUid(ui.uid);
+        if(p == null){
+            sendPackage.sum=0;
+        }else{
+            sendPackage.sum=Number((p.sum).toFixed(2));
+        }
 
-       sendPackage.num=await Guessnum.getPackCountByUid(ui.uid);
-       sendPackage.record=await Guessnum.getPacksByUid(ui.uid);
+        sendPackage.num=await Guessnum.getPackCountByUid(ui.uid);
+        sendPackage.record=await Guessnum.getPacksByUid(ui.uid,m.sendLimit,(m.sendPage-1)*m.sendLimit);
 
-       let r =await Guessnum.getReceivePackageRecordsMoneyByUid(ui.uid);
-       if(r == null){
-           receivePackage.sum=0;
-       }else{
-           receivePackage.sum=Number((r.moneyGot).toFixed(2));
-       }
+        let r =await Guessnum.getReceivePackageRecordsMoneyByUid(ui.uid);
+        if(r == null){
+            receivePackage.sum=0;
+        }else{
+            receivePackage.sum=Number((r.moneyGot).toFixed(2));
+        }
 
-       receivePackage.num=await Guessnum.getReceivePackageRecordsCountByUid(ui.uid);
-       receivePackage.record=await Guessnum.getReceivePackageRecordsByUid(ui.uid);
+        receivePackage.num=await Guessnum.getReceivePackageRecordsCountByUid(ui.uid);
+        receivePackage.record=await Guessnum.getReceivePackageRecordsByUid(ui.uid,m.receiveLimit,(m.receivePage-1)*m.receiveLimit);
 
         m.sendPackages=sendPackage;
         m.receivePackages=receivePackage;
-        console.log(m);
+
         trans.submit()
-}
+    }
    //获取加速卡
    @action(Acceleration)
    async getacceleration(trans:Trans){
@@ -423,7 +423,6 @@ export class Guessnum implements IRouter {
             pid: pid,
             uid:pack.userInfo.uid,
             title:pack.title,
-            //uid:"123",
             money:pack.money,
             remain:pack.money,
             password:pack.password,
@@ -440,6 +439,9 @@ export class Guessnum implements IRouter {
         });
     }
 
+    protected static async getPackInfo(pid:number):Promise<PackInfo>{
+        return await Query(PackInfo,{pid:pid});
+    }
 
     protected static async getGuessNum(pid:number):Promise<PackInfo>{
         return await Query(PackInfo,{pid:pid});
@@ -455,9 +457,8 @@ export class Guessnum implements IRouter {
         await Update(PackInfo,null,[{pid:pid},{$set:{status:status}}])
     }
 
-
-    protected static async getPacksByUid(uid:string){
-        return await QueryAll(PackInfo,{uid:uid});
+    protected static async getPacksByUid(uid:string,limit:number,skip:number){
+        return await QueryAll(PackInfo,{uid:uid},limit,skip);
     }
     protected static async getPackCountByUid(uid:string){
         return await Count(PackInfo,{uid:uid});
@@ -533,7 +534,6 @@ export class Guessnum implements IRouter {
 
     protected static getMarkId(mark:string){
         for(let i of configs.evaluates){
-            //console.log(i);
             if(i[1]==mark){
                 return i[0];
             }
@@ -544,18 +544,19 @@ export class Guessnum implements IRouter {
     protected static async getReceivePackageRecordsCountByUid(uid:string){
         return await Count(PackGuessRecord,{uid:uid});
     }
-    protected static async getReceivePackageRecordsByUid(uid:string){
-        let ps= await QueryAll(PackGuessRecord,{uid:uid});
+
+    protected static async getReceivePackageRecordsByUid(uid:string,limit:number,skip:number){
+        let ps= await QueryAll(PackGuessRecord,{uid:uid},limit,skip);
         let getPacks:GetPack[]=[];
         for(let p of ps){
             let getPack:GetPack = new GetPack();
-           let pack=await Guessnum.getGuessPack(p.pid);
+            let pack=await Guessnum.getGuessPack(p.pid);
             getPack.userInfo=await User.FindUserInfoByUid(pack.uid);
-            getPack.moneyGot = p.userGetMoney;
+            p.packInfo=await Guessnum.getPackInfo(p.pid);
+            getPack.guessInfo = p;
             getPacks.push(getPack);
         }
-        console.log("总记录");
-        console.log(getPacks);
+
         return getPacks
     }
 
