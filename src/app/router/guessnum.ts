@@ -64,7 +64,7 @@ export class Guessnum implements IRouter {
         //钱数OK,
         let pid = DateTime.Current();
         //创建消息通道
-        await Acquire(AppConfig.MQSRV).open("pack." + m.pid, {transmitter: true});
+        // await Acquire(AppConfig.MQSRV).open("pack." + m.pid, {transmitter: true});//websocket无法使用，改用客户端定时轮询
 
         //生成红包
 
