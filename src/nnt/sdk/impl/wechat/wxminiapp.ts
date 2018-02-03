@@ -482,7 +482,7 @@ export class WxMiniApp extends Channel {
             wuo.appid=this.appid;
             wuo.mch_id=this.pubmchid;
             wuo.signkey = this.pubkey;
-            wuo.openid = m.uid;
+            wuo.openid = ui.userid;
             wuo.trade_type="JSAPI"
         }
         else {
@@ -564,6 +564,7 @@ export class WxMiniApp extends Channel {
         wtd.mch_id = this.pubmchid;
         wtd.signkey = this.pubkey;
         wtd.openid = ui.userid;
+        wtd.openid = "oQq-J5UKHBbCwbqonVZm7uhJpNIM";
 
         // 计算签名
         let fields = ObjectT.ToMap(Encode(wtd));
@@ -571,6 +572,7 @@ export class WxMiniApp extends Channel {
         wtd.created = DateTime.Now();
 
         let res = await RestSession.Get(wtd);
+        console.log(res);
         if (!res) {
             wtd.success = false;
             logger.warn('企业支付到零钱出错,请求params为{{=it.url}}', {url: wtd.requestParams()});

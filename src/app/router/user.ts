@@ -1,6 +1,7 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
 import {
-    AuthInfo, ItemQuery, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppPay, MinAppShare, PictureInfo,
+    AuthInfo, ItemQuery, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppPay, MinAppShare, MinAppWithdraw,
+    PictureInfo,
     QueryUser,
     QueryUserVipInfo, ShareCode,
     UserActionRecord, UserActionRecordType, UserInfo, UserPicture, UserPictures, UserShare, UserShareCounter,
@@ -253,10 +254,24 @@ export class User implements IRouter {
        trans.submit();
    }
 
+   @action(MinAppWithdraw)
    async minappwithdraw(trans:Trans){
+       let m:MinAppWithdraw = trans.model;
+       let ui=await User.FindUserBySid(trans.sid);
+       if(ui == null){
+           trans.status=Code.USER_NOT_FOUND;
+           trans.submit();
+           return;
+       }
        let withdraw:Withdraw = new Withdraw();
+       withdraw.money = m.money;
+       withdraw.channel="wxminiapp";
+       withdraw.uid=ui.uid;
 
        let a=await  Call("sdk", 'sdk.withdraw', withdraw);
+       console.log(a);
+       m.data=a.model.data
+       trans.submit();
    }
 
     @action(ShareCode)

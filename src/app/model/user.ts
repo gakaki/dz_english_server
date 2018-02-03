@@ -399,3 +399,10 @@ export class MinAppPay{
     payload: IndexedObject;
 
 }
+
+export class MinAppWithdraw{
+    @double(1,[input],"提现金额")
+    money:number;
+    @type(2,Object,[output])
+    data:any;
+}
