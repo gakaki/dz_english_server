@@ -1,7 +1,7 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
 import {
-    AddItem,
-    AuthInfo, ItemQuery, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppShare, PictureInfo, QueryUser,
+    AuthInfo, ItemQuery, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppPay, MinAppShare, PictureInfo,
+    QueryUser,
     QueryUserVipInfo, ShareCode,
     UserActionRecord, UserActionRecordType, UserInfo, UserPicture, UserPictures, UserShare, UserShareCounter,
     UserShareDailyCounter, UserSid, UserTili, UserType, UserVipGiftCounter
@@ -23,9 +23,11 @@ import {logger} from "../../nnt/core/logger";
 import {UserBriefInfo, UserVipInfo} from "../model/common";
 import {IApiServer} from "../../nnt/server/apiserver";
 import {AbstractCronTask, CronAdd, PerDay} from "../../nnt/manager/crons";
-import {Auth, LoginMethod, SdkUserInfo} from "../../nnt/sdk/msdk";
+import {Auth, LoginMethod, Pay, PayMethod, SdkPayOrderId, SdkUserInfo} from "../../nnt/sdk/msdk";
 import {REGEX_PHONE} from "../../nnt/component/pattern";
 import {configs} from "../model/xlsconfigs";
+import {Api} from "../server/api";
+import {RechargeRecord} from "../model/shop";
 
 
 export class User implements IRouter {
@@ -79,8 +81,7 @@ export class User implements IRouter {
     @action(LoginInfo, [frqctl])
     async login(trans: Trans) {
         let m: LoginInfo = trans.model;
-        console.log("输入的参数");
-        console.log(m);
+
         // 没有输入账号，而且没有找到sid
         if (!m.sid &&
             !m.uid &&
@@ -102,13 +103,9 @@ export class User implements IRouter {
         let ui: UserInfo;
 
         // 第三方登陆
-        console.log("第三方登陆");
-        console.log(m.uid);
-        console.log("当前时间"+new Date().toLocaleString());
         if (m.uid) {
             // 直接通过uid来查找账号，找到后生成对应sid
             let sdkui = await Query(make_tuple(SdkUserInfo, "kv.sdk_users"), {userid:m.uid});
-            console.log(sdkui);
 
             if (!sdkui) {
                 trans.status = Code.LOGIN_FAILED;
@@ -122,11 +119,9 @@ export class User implements IRouter {
                 uid: m.uid,
                 third: true
             });
-            console.log("查询到的用户信息");
-            console.log(ui);
+
             if (!ui) {
                 // 自动注册
-                console.log("自动注册");
                 ui = await User.Register(
                     m.uid,
                     m.info.nickName,
@@ -137,8 +132,6 @@ export class User implements IRouter {
                 logger.info("使用第三方凭据注册账号 " + ui.pid);
             }else{
                 //更新一次userInfo
-                console.log("用户更新");
-                console.log(ui.pid);
                 await Update(UserInfo, null, [{pid: ui.pid}, {$set: {nickName: m.info.nickName, avatarUrl: m.info.avatarUrl}}]);
             }
             console.log(ui);
@@ -203,8 +196,6 @@ export class User implements IRouter {
             obj.data = trans.info;
         }));
 
-        console.log("输出用户");
-        console.log(m);
         trans.submit();
     }
    /* @action(AddItem)
@@ -212,6 +203,50 @@ export class User implements IRouter {
 
 
    }*/
+   @action(MinAppPay)
+   async minapppay(trans:Trans){
+       let m:MinAppPay = trans.model;
+       let ui=await User.FindUserBySid(trans.sid);
+       if(ui == null){
+           trans.status=Code.USER_NOT_FOUND;
+           trans.submit();
+           return;
+       }
+       let srv = static_cast<Api>(trans.server);
+       let payInfo:RechargeRecord = new RechargeRecord();
+       payInfo.price = m.payCount;
+       payInfo.time = DateTime.Current();
+       payInfo.pid = "123";
+       payInfo.type = "recharge";
+       let t = await Call(srv.sdksrv, "sdk.payorderid", trans.params);
+
+       if (t.status != STATUS.OK) {
+           logger.warn("获取订单号失败");
+           trans.status = t.status;
+           trans.submit();
+           return;
+       }
+
+       payInfo.orderid = (<SdkPayOrderId>t.model).orderid;
+
+       payInfo.desc = `发红包，金额:${payInfo.price}`;
+
+       await Insert(RechargeRecord, m);
+
+       let pay:Pay = new Pay();
+       pay.method=PayMethod.WECHAT_MINAPP;
+       pay.orderid=payInfo.orderid;
+       pay.price=payInfo.price;
+       pay.channel="wxminiapp";
+       pay.desc=payInfo.desc;
+       pay.uid=ui.uid;
+
+       let a=await  Call("sdk", 'sdk.pay', pay);
+
+       console.log(a);
+
+       trans.submit();
+   }
 
     @action(ShareCode)
     async minappshare(trans: Trans) {

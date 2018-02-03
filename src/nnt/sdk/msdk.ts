@@ -34,6 +34,7 @@ export enum PayMethod {
     WECHAT_PUB = 0x22, // 微信公众号支付
     WECHAT_APP = 0x23, // 微信APP支付
     WECHAT_H5 = 0x24,
+    WECHAT_MINAPP = 0x25,
 
     INAPP_MASK = 0x10,
     WECHAT_MASK = 0x20
