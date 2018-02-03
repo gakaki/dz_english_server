@@ -292,16 +292,8 @@ export function GenConfig(cfg: ConfigCfg) {
                     out = err.toString();
                 let outfile = expand(cfg.client);
                 fs.writeFileSync(outfile, out);
+                //到客户端目录下，手动执行：tsc -t es2015 config.ts
 
-                //转成js格式
-                if (shell.exec(`tsc -t es2015 ${outfile}`).code !== 0) {
-                    shell.echo('客户端转表失败');
-                    shell.exit(1);
-                }
-                else {
-                    shell.rm(outfile);
-                    logger.log('转表完成，请到客户端项目下，手动提交config.js');
-                }
                 next();
             });
         })
