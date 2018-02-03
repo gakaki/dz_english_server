@@ -294,6 +294,6 @@ export class WechatGetWxaCode extends Base{
     accessToken:string;
 
     @array(5,Object,[output])
-    out:any[]
+    reqBodyBytes:any[]
 
 }

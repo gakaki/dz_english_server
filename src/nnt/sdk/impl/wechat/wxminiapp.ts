@@ -419,7 +419,8 @@ export class WxMiniApp extends Channel {
         console.log("准备发请求了");
         console.log(wechatGetWxaCode);
         let result = await RestSession.Get(wechatGetWxaCode);
-        console.log(result);
+        console.log("返回值");
+        console.log(result.reqBodyBytes);
         let localData=new Date().toLocaleDateString();
         let rootPath="./minAPPShare/";
         let firstPth=rootPath+m.uid+"/";
@@ -564,7 +565,7 @@ export class WxMiniApp extends Channel {
         wtd.mch_id = this.pubmchid;
         wtd.signkey = this.pubkey;
         wtd.openid = ui.userid;
-        wtd.openid = "oQq-J5UKHBbCwbqonVZm7uhJpNIM";
+       
 
         // 计算签名
         let fields = ObjectT.ToMap(Encode(wtd));

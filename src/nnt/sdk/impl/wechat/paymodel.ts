@@ -24,6 +24,9 @@ export abstract class WechatPayModel extends Base {
     parseData(resp: IResponseData, suc: () => void, error: (err: Error) => void) {
         let data = resp.data.xml;
 
+        console.log("我从微信拿到的数据+++++++++++++");
+        console.log(data);
+
         if (data.return_code == "SUCCESS") {
             resp.code = 0;
             resp.data = data;
