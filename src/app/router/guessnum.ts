@@ -274,7 +274,7 @@ export class Guessnum implements IRouter {
             trans.submit();
             return
         }
-
+        m.originator=await User.FindUserInfoByUid(pack.uid);
         m.packPassword=pack.password;
         m.packInfo={
             totalMoney:pack.money,

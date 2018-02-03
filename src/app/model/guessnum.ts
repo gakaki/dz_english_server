@@ -135,6 +135,9 @@ export class PackRecords{
     @integer(1,[input,output],"红包id")
     pid:number;
 
+    @type(5,UserInfo,[output],"发起人用户信息")
+    originator:UserInfo;
+
     @string(2,[output],"红包竞猜答案")
     packPassword:string;
 
