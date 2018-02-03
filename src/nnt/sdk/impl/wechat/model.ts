@@ -262,6 +262,7 @@ export class WechatGetWxaCode extends Base{
         super();
         this.method = HttpMethod.POST;
         this.requestType=HttpContentType.JSON;
+        this.responseType=HttpContentType.JSON;
     }
 
     requestUrl(): string {
@@ -271,7 +272,7 @@ export class WechatGetWxaCode extends Base{
         let rp = new RequestParams();
         rp.fields = {
             scene: this.scene,
-            page: this.page,
+           // page: this.page,
             width: this.width
         };
         return rp;
@@ -293,6 +294,6 @@ export class WechatGetWxaCode extends Base{
     accessToken:string;
 
     @array(5,Object,[output])
-    sharePicture:any[]
+    out:any[]
 
 }

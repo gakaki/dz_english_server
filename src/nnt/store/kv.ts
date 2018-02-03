@@ -30,7 +30,7 @@ export abstract class AbstractNosql extends AbstractKv {
 
     // @page 数据分片，mongo中叫collection
     // @cmd 查询指令
-    abstract query(page: string, cmd: NosqlCmdType, limit: number, cb: (res: RecordObject[]) => void): void;
+    abstract query(page: string, cmd: NosqlCmdType, limit: number,skip:number, cb: (res: RecordObject[]) => void): void;
 
     // 统计数量
     abstract count(page: string, cmd: NosqlCmdType, cb: (cnt: number) => void): void;

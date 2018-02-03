@@ -251,7 +251,7 @@ export async function Query<T>(clz: TransactionDef<T>, cmd: cmd_t): Promise<T> {
         });
     };
     t.nosqlproc = db => {
-        db.query(t.table, <Object>cmd, 1, res => {
+        db.query(t.table, <Object>cmd, 1, 0,res => {
             if (res == null || !res.length)
                 t.resolve(null);
             else if (res.length > 1)
@@ -269,7 +269,7 @@ export async function Query<T>(clz: TransactionDef<T>, cmd: cmd_t): Promise<T> {
 }
 
 // 获得一组数据
-export async function QueryAll<T>(clz: TransactionDef<T>, cmd: cmd_t, limit?: number): Promise<T[]> {
+export async function QueryAll<T>(clz: TransactionDef<T>, cmd: cmd_t, limit?: number,skip?:number): Promise<T[]> {
     let t = new Transaction<T, T[]>(clz);
     t.rdbproc = db => {
         let q: RdbCmdType;
@@ -292,7 +292,7 @@ export async function QueryAll<T>(clz: TransactionDef<T>, cmd: cmd_t, limit?: nu
         });
     };
     t.nosqlproc = db => {
-        db.query(t.table, <Object>cmd, limit, res => {
+        db.query(t.table, <Object>cmd, limit, skip,res => {
             if (res == null)
                 t.resolve([]);
             else {

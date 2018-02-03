@@ -1,5 +1,5 @@
 import {
-    array, boolean, double, input, integer, json, model, output, string,
+    array, boolean, double, input, integer, json, model, optional, output, string,
     type
 } from "../../nnt/core/proto";
 import { colboolean, coldouble, colinteger, coljson, colstring, table} from "../../nnt/store/proto";
@@ -105,21 +105,24 @@ export class ClearCD{
 
 
 
+
 @model()
 @table('kv','packGuess_records')
 export class PackGuessRecord{
-   //  @string(1,[output],"用户id")
     @colstring()
     uid:string;
 
-     @type(9,UserInfo,[output],"用户信息")
-     userInfo:UserInfo;
+    @type(9,UserInfo,[output],"用户信息")
+    userInfo:UserInfo;
 
-  // @integer(2,[output],"红包id")
+    // @integer(2,[output],"红包id")
     @colinteger()
     pid:number;
 
-     @string(3,[output],"用户回答答案")
+    @type(10,PackInfo,[output],"红包信息")
+    packInfo:PackInfo;
+
+    @string(3,[output],"用户回答答案")
     @colstring()
     userAnswerWord:string;
 
@@ -127,16 +130,16 @@ export class PackGuessRecord{
     @coldouble()
     userGetMoney:number;
 
-   @string(5,[output],"用户回答的结果")
+    @string(5,[output],"用户回答的结果")
     @colstring()
     userMark:string;
 
-   @string(6,[output],"评语")
-   @colstring()
-   commit:string;
+    @string(6,[output],"评语")
+    @colstring()
+    commit:string;
 
-   @colstring()
-   createTime:string;
+    @colstring()
+    createTime:string;
 
 }
 
@@ -203,9 +206,10 @@ export class SendPackage{
 export class GetPack{
     @type(1,UserInfo,[output],"红包的主人")
     userInfo:UserInfo;
-    @double(2,[output],"获取的金额")
-    moneyGot:number;
+    @type(2,PackGuessRecord,[output],"红包信息")
+    guessInfo:PackGuessRecord;
 }
+
 
 @model()
 export class ReceivePackage{
@@ -217,14 +221,31 @@ export class ReceivePackage{
     record:GetPack[]
 }
 
+
 @model()
 export class UserPackRecord{
+
     @type(1,SendPackage,[output],"发送红包")
     sendPackages:SendPackage;
+
+
     @type(2,ReceivePackage,[output],"收到的红包")
     receivePackages:ReceivePackage;
-}
 
+    @integer(3,[input,optional])
+    sendPage:number =1;
+
+    @integer(4,[input,optional])
+    sendLimit:number =20;
+
+    @integer(5,[input,optional])
+    receivePage:number =1;
+
+    @integer(6,[input,optional])
+    receiveLimit:number =20;
+
+
+}
 @model()
 export class Acceleration{
 

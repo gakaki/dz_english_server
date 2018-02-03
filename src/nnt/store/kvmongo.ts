@@ -191,7 +191,7 @@ export class KvMongo extends AbstractNosql {
         });
     }
 
-    query(page: string, cmd: NosqlCmdType, limit: number, cb: (res: RecordObject[]) => void) {
+    query(page: string, cmd: NosqlCmdType, limit: number,skip:number ,cb: (res: RecordObject[]) => void) {
         if (typeof cmd == "string") {
             // 传入了IID
             cmd = {_id: StrToObjectId(cmd)};
@@ -213,8 +213,12 @@ export class KvMongo extends AbstractNosql {
         }
         else {
             let cursor = col.find(cmd);
+            if(!skip){
+                skip=0;
+            }
             if (limit > 1)
                 cursor.limit(limit);
+            cursor.skip(skip);
             cursor.toArray((err, rcds) => {
                 if (err) {
                     logerr(err, ["query", cmd]);
