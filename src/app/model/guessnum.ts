@@ -81,6 +81,12 @@ export class Guess{
     @integer(2,[input],"红包id")
     pid:number;
 
+    @string(5,[output])
+    markId:string;
+
+    @string(6,[output],"评语")
+    commit:string;
+
     @string(3,[output],"用户竞猜答案")
     mark:string;
 
@@ -123,6 +129,10 @@ export class PackGuessRecord{
     @colstring()
     userMark:string;
 
+   @string(6,[output],"评语")
+   @colstring()
+   commit:string;
+
    @colstring()
    createTime:string;
 
@@ -134,6 +144,9 @@ export class PackGuessRecord{
 export class PackRecords{
     @integer(1,[input,output],"红包id")
     pid:number;
+
+    @type(5,UserInfo,[output],"发起人用户信息")
+    originator:UserInfo;
 
     @string(2,[output],"红包竞猜答案")
     packPassword:string;
@@ -155,8 +168,8 @@ export class RankInfo{
     @double(3,[output],"获取的总金额")
     moneyGot:number;
 
-    @string(5,[output])
-    maxMarkId:string
+    @type(5,PackGuessRecord,[output])
+    maxRecord:PackGuessRecord;
 
     @array(4,PackGuessRecord,[output],"竞猜记录")
     guessRecords:PackGuessRecord[];
