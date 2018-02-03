@@ -25,18 +25,15 @@ export class Guessnum implements IRouter {
     @action(PackInfo)
     async sendpack(trans: Trans){
         let m: PackInfo = trans.model;
-        console.log(trans.sid);
 
         let ui:UserInfo=await User.FindUserBySid(trans.sid);
-        console.log(ui);
+
         if(ui==null){
             trans.status = Code.USER_NOT_FOUND;
             trans.submit();
             return
         }
        m.userInfo=ui;
-
-       // m.userInfo=null;
 
         let delta = new Delta();
         if(ui.itemCount(configs.Item.MONEY)<m.money){
@@ -340,7 +337,7 @@ export class Guessnum implements IRouter {
        if(p == null){
            sendPackage.sum=0;
        }else{
-           sendPackage.sum=p.sum;
+           sendPackage.sum=Number((p.sum).toFixed(2));
        }
 
        sendPackage.num=await Guessnum.getPackCountByUid(ui.uid);
@@ -350,7 +347,7 @@ export class Guessnum implements IRouter {
        if(r == null){
            receivePackage.sum=0;
        }else{
-           receivePackage.sum=r.moneyGot;
+           receivePackage.sum=Number((r.moneyGot).toFixed(2));
        }
 
        receivePackage.num=await Guessnum.getReceivePackageRecordsCountByUid(ui.uid);

@@ -129,10 +129,10 @@ export class Delta {
         if (this.items.has(idx)) {
             let now = this.items.get(idx);
             now += count;
-            this.items.set(idx, now);
+            this.items.set(idx, Number(now.toFixed(2)));
         }
         else {
-            this.items.set(idx, count);
+            this.items.set(idx, Number(count.toFixed(2)));
         }
         return this;
     }
