@@ -545,7 +545,7 @@ export class WxMiniApp extends Channel {
         return `withdraw_${uid}_${DateTime.Current()}`
     }
 
-    async doWithdraw(m: Withdraw, ui: SdkUserInfo): Promise<void> {
+    async doWithdraw(m: Withdraw, ui: SdkUserInfo): Promise<boolean> {
         let wtd: WxappPaytoUser = new WxappPaytoUser();
         wtd.nonce_str = NonceAlDig(10);
 
@@ -568,7 +568,7 @@ export class WxMiniApp extends Channel {
             wtd.success = false;
             logger.warn('企业支付到零钱出错,请求params为{{=it.url}}', {url: wtd.requestParams()});
             Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(wtd));
-            return ;
+            return false;
         }
 
         //组装返回的数据
@@ -585,6 +585,7 @@ export class WxMiniApp extends Channel {
         // 保存纪录
         res.success = true;
         Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(res));
+        return true;
     }
 
     protected doSignaturePay(fields: Map<string, any>, key: string): string {

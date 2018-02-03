@@ -51,7 +51,7 @@ export abstract class Channel {
     abstract doRemoteAudios(m: GetRemoteMedia, ui?: SdkUserInfo): Promise<void>;
 
     //提现（从豆子账号通过企业付款给用户）
-    abstract doWithdraw(m: Withdraw, ui?: SdkUserInfo): Promise<void>;
+    abstract doWithdraw(m: Withdraw, ui?: SdkUserInfo): Promise<boolean>;
 
     //微信小程序分享二维码
     abstract doMinAppShare(m: MinAppShare, ui?: SdkUserInfo):Promise<any>;

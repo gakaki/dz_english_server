@@ -375,8 +375,10 @@ export class RSdk implements IRouter {
             return;
         }
 
-        await chann.doWithdraw(m, rcd);
-
+        let ok = chann.doWithdraw(m, rcd);
+        if (!ok) {
+            trans.status = STATUS.FAILED;
+        }
         trans.submit();
     }
 }
