@@ -128,6 +128,7 @@ export class Guessnum implements IRouter {
                 console.log(new Date().getTime());
                 if(pack.CDList[trans.sid]+Number(configs.Parameter.Get("waitcd").value)*1000 >= new Date().getTime()){
                     trans.status = Code.PACK_ISCD;
+                    m.restTime=new Date(pack.CDList[trans.sid]+Number(configs.Parameter.Get("waitcd").value)*1000-new Date().getTime()).toTimeString();
                     trans.submit();
                     return
                 }else{
@@ -146,7 +147,7 @@ export class Guessnum implements IRouter {
        let B = result.B;
        let probability=0;
 
-       switch (A+B){
+        switch (A+B){
            case 4:
                let cfgAAAA= configs.Distribution.Get(4);
                if(pack.AAAA){
@@ -158,6 +159,7 @@ export class Guessnum implements IRouter {
                break;
            case 3:
                let cfgAAA= configs.Distribution.Get(3);
+               console.log(cfgAAA);
                if(pack.AAA){
                    probability = Random.Rangef(cfgAAA.min,cfgAAA.max);
                }else{
@@ -176,6 +178,7 @@ export class Guessnum implements IRouter {
                break;
            case 1:
                let cfgA= configs.Distribution.Get(1);
+               console.log(cfgA);
                if(pack.A){
                    probability = Random.Rangef(cfgA.min,cfgA.max);
                }else{
@@ -228,6 +231,7 @@ export class Guessnum implements IRouter {
         console.log("结束");
         console.log(pack.CDList);
         await Guessnum.saveUserGuessRecord(ui.uid,m.guessNum,m.moneyGeted,m.mark,m.pid,m.commit);
+      //  await Guessnum.saveUserGuessRecord("123",m.guessNum,m.moneyGeted,m.mark,m.pid,m.commit);
 
         let delta = new Delta();
         delta.addkv(configs.Item.MONEY,m.moneyGeted);

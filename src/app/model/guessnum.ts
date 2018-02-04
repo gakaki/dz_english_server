@@ -95,6 +95,9 @@ export class Guess{
     @double(4,[output],"用户获得的金钱")
     moneyGeted:number;
 
+    @string(8,[output])
+    restTime:string;
+
 }
 
 @model()
