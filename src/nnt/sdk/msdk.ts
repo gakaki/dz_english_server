@@ -297,6 +297,9 @@ export class Pay {
     @colstring()
     tag: string;
 
+    @string(10,[input])
+    IP:string;
+
     @json(9, [output], "客户端发起支付需要的数据")
     @coljson()
     payload: IndexedObject;

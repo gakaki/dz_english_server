@@ -304,10 +304,7 @@ export class Guessnum implements IRouter {
         }
         m.originator=await User.FindUserInfoByUid(pack.uid);
         m.packPassword=pack.password;
-        m.packInfo={
-            totalMoney:pack.money,
-            restMoney:pack.remain
-        };
+        m.packInfo=pack;
         let records=await Guessnum.getPackGuessRecords(m.pid);
         console.log("查询的记录");
         console.log(records);

@@ -29,6 +29,14 @@ import {ACROOT} from "../../../acl/acl";
 import {MinAppShare} from "../../../../app/model/user";
 import * as fs from "fs";
 import {User} from "../../../../app/router/user";
+import xml = require("xmlbuilder");
+import xml2js = require("xml2js");
+import request = require("request");
+import moment = require("moment");
+import * as https from "https";
+
+
+
 
 export class WxMiniApp extends Channel {
 
@@ -460,7 +468,11 @@ export class WxMiniApp extends Channel {
         wuo.body = m.desc;
         wuo.out_trade_no = m.orderid;
         wuo.total_fee = m.price; // 正式的价格
-        wuo.spbill_create_ip = trans.info.addr;
+        wuo.time_start=moment(new Date()).format("YYYYMMDDHHMMSS");
+        console.log("用户端ip");
+        console.log(trans.info.addr);
+       // wuo.spbill_create_ip = trans.info.addr;
+        wuo.spbill_create_ip = m.IP;
         wuo.notify_url = this.noticeurl + "/method/" + m.method + "/channel/wechat"; // 会变成参数传递给completePay接口，用来判断是哪个渠道发来的回调
 
         if (m.method == PayMethod.WECHAT_PUB) {
@@ -500,11 +512,14 @@ export class WxMiniApp extends Channel {
         wuo.created = DateTime.Now();
 
         let res = await RestSession.Get(wuo);
+        console.log("我发送请求了==============================");
+        console.log(res);
         if (!res) {
             wuo.success = false;
             Insert(make_tuple(this._sdk.dbsrv, WechatUnifiedOrder), Output(wuo));
             return false;
         }
+
 
         // 微信的每种方式产生的payload格式是不一样的
         if (m.method == PayMethod.WECHAT_PUB) {
@@ -513,17 +528,17 @@ export class WxMiniApp extends Channel {
                 timeStamp: DateTime.Current().toString(),
                 nonceStr: NonceAlDig(10),
                 package: "prepay_id=" + res.prepay_id,
-                signType: "MD5"
+                signType: "MD5",
             };
             fields = ObjectT.ToMap(m.payload);
             m.payload.paySign = this.doSignaturePay(fields, wuo.signkey);
         }else if(m.method == PayMethod.WECHAT_MINAPP){
             m.payload = {
                 appId: this.pubid,
-                timeStamp: DateTime.Current().toString(),
                 nonceStr: NonceAlDig(10),
                 package: "prepay_id=" + res.prepay_id,
-                signType: "MD5"
+                signType: "MD5",
+                timeStamp: DateTime.Current().toString(),
             };
             fields = ObjectT.ToMap(m.payload);
             m.payload.paySign = this.doSignaturePay(fields, wuo.signkey);
@@ -564,6 +579,15 @@ export class WxMiniApp extends Channel {
         return `withdraw${DateTime.Current()}`;
     }
 
+    protected static buildXML(json:any){
+            var builder = new xml2js.Builder();
+            return builder.buildObject(json);
+    };
+    protected static parseXML (xml:any, fn:any){
+        var parser = new xml2js.Parser({ trim:true, explicitArray:false, explicitRoot:false });
+        parser.parseString(xml, fn||function(err:Error, result:any){});
+    };
+
     async doWithdraw(m: Withdraw, ui: SdkUserInfo): Promise<boolean> {
         let wtd: WxappPaytoUser = new WxappPaytoUser();
         wtd.nonce_str = NonceAlDig(10);
@@ -571,14 +595,14 @@ export class WxMiniApp extends Channel {
         //sign
         wtd.partner_trade_no = this.genWithdrawTradeNO(m.uid);
         wtd.amount = m.money*100; // 正式的价格
-        wtd.spbill_create_ip = getServerIp();
-        //wtd.spbill_create_ip = "192.168.0.1";
+        //wtd.spbill_create_ip = getServerIp();
+        wtd.spbill_create_ip = "192.168.0.1";
         wtd.mch_appid = this.appid;
         wtd.mchid = this.pubmchid;
         wtd.signkey = this.pubkey;
         wtd.check_name="NO_CHECK";
-        wtd.openid = ui.userid;
-        //wtd.openid = "oQq-J5XuO2NawkxByfpkMrOAPmLg";
+        //wtd.openid = ui.userid;
+        wtd.openid = "oQq-J5XuO2NawkxByfpkMrOAPmLg";
 
 
         // 计算签名
@@ -586,9 +610,10 @@ export class WxMiniApp extends Channel {
         wtd.sign = this.doSignaturePay(fields, wtd.signkey);
         wtd.created = DateTime.Now();
 
+
         let res = await RestSession.Get(wtd);
         console.log(res);
-        if (!res) {
+       if (!res) {
             wtd.success = false;
             logger.warn('企业支付到零钱出错,请求params为{{=it.url}}', {url: wtd.requestParams()});
             Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(wtd));
@@ -619,6 +644,9 @@ export class WxMiniApp extends Channel {
         });
         argus.push("key=" + key);
         let plain = argus.join("&");
+
+        console.log(plain);
+
         let sign = StringDigest.MD5(plain, Format.HEX).toUpperCase();
         return sign;
     }

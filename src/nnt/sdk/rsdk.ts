@@ -356,14 +356,14 @@ export class RSdk implements IRouter {
         let m: Withdraw = trans.model;
 
         let rcd: SdkUserInfo;
-        if (m.uid) {
+       /* if (m.uid) {
             rcd = await Query(make_tuple(this._sdk.dbsrv, SdkUserInfo), {userid:m.uid});
             if (!rcd) {
                 trans.status = STATUS.TARGET_NOT_FOUND;
                 trans.submit();
                 return;
             }
-        }
+        }*/
         trans.timeout(20);
 
         let chann = this._sdk.channel(m.channel);

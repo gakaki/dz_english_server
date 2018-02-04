@@ -231,7 +231,7 @@ export class User implements IRouter {
 
        payInfo.orderid = (<SdkPayOrderId>t.model).orderid;
 
-       payInfo.desc = `发红包，金额:${payInfo.price}`;
+       payInfo.desc = "豆子网络-游戏";
 
        await Insert(RechargeRecord, m);
 
@@ -242,6 +242,7 @@ export class User implements IRouter {
        pay.channel="wxminiapp";
        pay.desc=payInfo.desc;
        pay.uid=ui.uid;
+       pay.IP=m.IP;
 
        let a=await  Call("sdk", 'sdk.pay', pay);
 
@@ -258,17 +259,17 @@ export class User implements IRouter {
    @action(MinAppWithdraw)
    async minappwithdraw(trans:Trans){
        let m:MinAppWithdraw = trans.model;
-       let ui=await User.FindUserBySid(trans.sid);
+      /* let ui=await User.FindUserBySid(trans.sid);
        if(ui == null){
            trans.status=Code.USER_NOT_FOUND;
            trans.submit();
            return;
-       }
+       }*/
        let withdraw:Withdraw = new Withdraw();
        withdraw.money = m.money;
        withdraw.channel="wxminiapp";
-       withdraw.uid=ui.uid;
-       //withdraw.uid="123";
+     //  withdraw.uid=ui.uid;
+       withdraw.uid="123";
 
        let a=await  Call("sdk", 'sdk.withdraw', withdraw);
        console.log(a);

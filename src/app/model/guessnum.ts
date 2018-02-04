@@ -159,8 +159,8 @@ export class PackRecords{
     @string(2,[output],"红包竞猜答案")
     packPassword:string;
 
-    @json(3,[output],"红包详情")
-    packInfo:any;
+    @type(3,PackInfo,[output],"红包详情")
+    packInfo:PackInfo;
 
     @array(4,Object,[output],"抢红包记录")
     records:any[];
