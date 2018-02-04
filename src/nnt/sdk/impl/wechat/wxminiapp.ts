@@ -473,6 +473,10 @@ export class WxMiniApp extends Channel {
         console.log(trans.info.addr);
        // wuo.spbill_create_ip = trans.info.addr;
         wuo.spbill_create_ip = m.IP;
+        if(!m.IP){
+            wuo.spbill_create_ip = trans.info.addr;
+        }
+
         wuo.notify_url = this.noticeurl + "/method/" + m.method + "/channel/wechat"; // 会变成参数传递给completePay接口，用来判断是哪个渠道发来的回调
 
         if (m.method == PayMethod.WECHAT_PUB) {
@@ -534,7 +538,7 @@ export class WxMiniApp extends Channel {
             m.payload.paySign = this.doSignaturePay(fields, wuo.signkey);
         }else if(m.method == PayMethod.WECHAT_MINAPP){
             m.payload = {
-                appId: this.pubid,
+                appId: this.appid,
                 nonceStr: NonceAlDig(10),
                 package: "prepay_id=" + res.prepay_id,
                 signType: "MD5",

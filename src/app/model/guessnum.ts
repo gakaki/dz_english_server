@@ -70,7 +70,7 @@ export class PackInfo {
     @coljson()
     CDList:any;
 
-    @string(10,[input,output],"红包标题")
+    @string(10,[input,output,optional],"红包标题")
     @colstring()
     title:string
 }

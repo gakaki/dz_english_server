@@ -398,7 +398,7 @@ export class MinAppPay{
     @coljson()
     payload: IndexedObject;
 
-    @string(3,[input])
+    @string(3,[input,optional])
     IP:string;
 
 }
