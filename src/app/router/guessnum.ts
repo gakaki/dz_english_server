@@ -17,6 +17,8 @@ import {Delta} from "../model/item";
 import {Acquire} from "../../nnt/server/mq";
 import {AppConfig} from "../model/appconfig";
 import {async} from "../../nnt/core/proto";
+import * as fs from "fs";
+import {logger} from "../../nnt/core/logger";
 
 
 
@@ -28,7 +30,7 @@ export class Guessnum implements IRouter {
     @action(PackInfo)
     async sendpack(trans: Trans){
         let m: PackInfo = trans.model;
-
+        console.log("发送红包");
         let ui:UserInfo=await User.FindUserBySid(trans.sid);
 
         if(ui==null){
@@ -223,7 +225,8 @@ export class Guessnum implements IRouter {
 
         let get = Math.floor(pack.money*100*probability);
         m.moneyGeted =get/100;
-
+        console.log("获取的金额");
+        console.log(get);
         if(A==4){
             pack.status=Code.PACK_FINSH;
             m.moneyGeted=pack.remain;
@@ -246,9 +249,12 @@ export class Guessnum implements IRouter {
         }
         let remain =pack.remain;
         let moneyGeted=m.moneyGeted;
+        console.log(remain);
+        console.log(moneyGeted);
+        pack.remain =(remain*100-moneyGeted*100)/100;
 
-       pack.remain =(remain*100-moneyGeted*100)/100;
-
+        console.log("红包剩余");
+        console.log(pack.remain);
         pack.CDList[trans.sid] = new Date().getTime();
         pack.guessCount -= 1;
         await Guessnum.updatePack(pack);
@@ -397,10 +403,29 @@ export class Guessnum implements IRouter {
            trans.submit();
            return
        }
-
-       let delta = new Delta();
-       delta.addkv(configs.Item.ACCELERATION,m.num);
-       await User.ApplyDelta(ui,delta);
+       let localData=new Date().toLocaleDateString();
+       let rootPath="./minAPPShare/";
+       let firstPth=rootPath+ui.uid+"/";
+       let secondPath=firstPth+localData+"/";
+       try{
+           if(!await fs.existsSync(rootPath)){
+               await fs.mkdirSync(rootPath);
+           }
+           if(!await fs.existsSync(firstPth)){
+               await fs.mkdirSync(firstPth);
+           }
+           if(!await fs.existsSync(secondPath)){
+               //每日首次分享
+               let delta = new Delta();
+               delta.addkv(configs.Item.ACCELERATION,1);
+               await User.ApplyDelta(ui,delta);
+               await fs.mkdirSync(secondPath);
+           }else{
+               trans.status=Code.PACK_ISSHARED;
+           }
+       }catch (err){
+           logger.warn("文件IO异常: "+err);
+       }
 
        trans.submit();
    }
@@ -542,9 +567,9 @@ export class Guessnum implements IRouter {
             if(pack!=null){
                 getPack.userInfo=await User.FindUserInfoByUid(pack.uid);
                 getPack.guessInfo = p;
+                p.packInfo=pack;
+                getPacks.push(getPack);
             }
-            p.packInfo=pack;
-            getPacks.push(getPack);
         }
 
         return getPacks
