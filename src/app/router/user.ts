@@ -206,8 +206,13 @@ export class User implements IRouter {
             trans.submit();
             return;
         }
-        await User.ApplyDelta(ui, cost);
+        if(ui.itemCount(m.itemId) +m.num >=0){
+            await User.ApplyDelta(ui, cost);
+        }else{
+            trans.status=Code.NEED_ITEMS;
+        }
 
+        m.userInfo=await Query(UserInfo,{"uid":m.uid});
         trans.submit();
 
 

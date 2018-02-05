@@ -390,14 +390,17 @@ export class ItemQuery{
 }
 
 export class ChaneItem{
-    @integer(1,[input,output])
+    @integer(1,[input])
     itemId:number;
 
-    @integer(2,[input,output])
+    @integer(2,[input])
     num:number;
 
-    @string(3,[input,output])
+    @string(3,[input])
     uid:string
+
+    @type(4,UserInfo,[output])
+    userInfo:UserInfo;
 }
 
 @model()
