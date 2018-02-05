@@ -358,6 +358,7 @@ export class Guessnum implements IRouter {
             trans.submit();
             return
         }
+        console.log(ui);
         let sendPackage:SendPackage = new SendPackage();
         let receivePackage:ReceivePackage = new ReceivePackage();
 
@@ -435,10 +436,6 @@ export class Guessnum implements IRouter {
     }
 
 
-
-    protected static async getPackInfo(pid:number):Promise<PackInfo>{
-        return await Query(PackInfo,{pid:pid});
-    }
 
     protected static async getGuessPack(pid:number):Promise<PackInfo>{
         return await Query(PackInfo,{pid:pid});
@@ -542,9 +539,11 @@ export class Guessnum implements IRouter {
         for(let p of ps){
             let getPack:GetPack = new GetPack();
             let pack=await Guessnum.getGuessPack(p.pid);
-            getPack.userInfo=await User.FindUserInfoByUid(pack.uid);
-            p.packInfo=await Guessnum.getPackInfo(p.pid);
-            getPack.guessInfo = p;
+            if(pack!=null){
+                getPack.userInfo=await User.FindUserInfoByUid(pack.uid);
+                getPack.guessInfo = p;
+            }
+            p.packInfo=pack;
             getPacks.push(getPack);
         }
 
