@@ -388,6 +388,18 @@ export class ItemQuery{
     @double(2,[output])
     stock:number;
 }
+
+export class ChaneItem{
+    @integer(1,[input,output])
+    itemId:number;
+
+    @integer(2,[input,output])
+    num:number;
+
+    @string(3,[input,output])
+    uid:string
+}
+
 @model()
 export class MinAppPay{
 

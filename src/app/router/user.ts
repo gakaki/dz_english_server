@@ -1,6 +1,7 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
 import {
-    AuthInfo, ItemQuery, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppPay, MinAppShare, MinAppWithdraw,
+    AuthInfo, ChaneItem, ItemQuery, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppPay, MinAppShare,
+    MinAppWithdraw,
     PictureInfo,
     QueryUser,
     QueryUserVipInfo, ShareCode,
@@ -193,11 +194,24 @@ export class User implements IRouter {
 
         trans.submit();
     }
-   /* @action(AddItem)
-   async additem(trans:Trans){
+    @action(ChaneItem)
+   async chaneitem(trans:Trans){
+        let m:ChaneItem = trans.model;
+        let cost = new Delta();
+
+        cost.addkv(m.itemId,m.num);
+        let ui=await Query(UserInfo,{"uid":m.uid});
+        if(ui == null){
+            trans.status=Code.USER_NOT_FOUND;
+            trans.submit();
+            return;
+        }
+        await User.ApplyDelta(ui, cost);
+
+        trans.submit();
 
 
-   }*/
+   }
    @action(MinAppPay)
    async minapppay(trans:Trans){
        let m:MinAppPay = trans.model;

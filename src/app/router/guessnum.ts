@@ -82,7 +82,7 @@ export class Guessnum implements IRouter {
 
         //应用扣除
         await User.ApplyDelta(ui, cost);
-        let money=ui.itemCount(1);
+
 
         //存库
         m.pid = DateTime.Current();
