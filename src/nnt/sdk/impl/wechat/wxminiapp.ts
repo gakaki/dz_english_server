@@ -600,8 +600,8 @@ export class WxMiniApp extends Channel {
         //sign
         wtd.partner_trade_no = this.genWithdrawTradeNO(m.uid);
         wtd.amount = m.money*100; // 正式的价格
-        //wtd.spbill_create_ip = getServerIp();
-        wtd.spbill_create_ip = "192.168.0.1";
+        wtd.spbill_create_ip = getServerIp()||"192.168.0.1";
+        //wtd.spbill_create_ip = "192.168.0.1";
         wtd.mch_appid = this.appid;
         wtd.mchid = this.pubmchid;
         wtd.signkey = this.pubkey;
@@ -649,7 +649,7 @@ export class WxMiniApp extends Channel {
             mchid: this.pubmchid,
             partnerKey: this.pubkey,
             pfx: fs.readFileSync(expand(Config.WX_P12)),
-            spbill_create_ip: '10.1.70.71'
+            spbill_create_ip:getServerIp()|| '10.1.70.71'
         };
         const api = new tenpay(config);
 
