@@ -16,6 +16,7 @@ import {configs} from "../model/xlsconfigs";
 import {Delta} from "../model/item";
 import {Acquire} from "../../nnt/server/mq";
 import {AppConfig} from "../model/appconfig";
+import {async} from "../../nnt/core/proto";
 
 
 
@@ -27,6 +28,8 @@ export class Guessnum implements IRouter {
     @action(PackInfo)
     async sendpack(trans: Trans){
         let m: PackInfo = trans.model;
+
+        console.log("请求来了");
 
         let ui:UserInfo=await User.FindUserBySid(trans.sid);
 
@@ -45,12 +48,16 @@ export class Guessnum implements IRouter {
                 trans.submit();
                 return;
             }
-            m.money--;//代金券抵1元
+           // m.money -= 100;//代金券抵1元
             //扣代金券
             cost.addkv(configs.Item.CASHCOUPON, 1);
         }
         //扣钱数
-        cost.addkv(configs.Item.MONEY, m.money);
+        cost.addkv(configs.Item.MONEY, m.money*100);
+        //获得加速卡
+        cost.addkv(configs.Item.ACCELERATION,2);
+
+
 
         let need = Delta.NeedItems(cost.items, ui.items);
         //钱数不足，客户端根据错误码跳支付
@@ -69,14 +76,28 @@ export class Guessnum implements IRouter {
         //生成红包
 
         //应用扣除
-        User.ApplyDelta(ui, cost);
+        await User.ApplyDelta(ui, cost.asCost());
         //存库
         m.pid = DateTime.Current();
-        m.createTime = Date.now() + '';
+        m.uid=ui.uid;
         m.password = Guessnum.getCode();
         m.remain = m.money;
         m.status = Code.PACK_Fighing;
+
+
         await Insert(PackInfo, m);
+
+
+        setTimeout(async function () {
+            console.log("红包要过期了");
+            let pack = await Guessnum.getGuessPack(m.pid);
+            pack.status=Code.PACK_EXPIRED;
+            await Guessnum.updatePack(pack);
+            let cost = new Delta();
+            cost.addkv(configs.Item.MONEY, pack.remain);
+            await User.ApplyDelta(ui, cost);
+
+        },configs.Parameter.Get("expire"));
 
         trans.submit();
     }
@@ -90,7 +111,7 @@ export class Guessnum implements IRouter {
             trans.submit();
             return
         }
-        let pack=await Guessnum.getGuessNum(m.pid);
+        let pack=await Guessnum.getGuessPack(m.pid);
         if(pack == null){
             trans.status = Code.PACK_EMPTY;
             trans.submit();
@@ -187,7 +208,7 @@ export class Guessnum implements IRouter {
                }
                break;
            case 0:
-               let cfg= configs.Distribution.Get(0);
+               let cfg= configs.Distribution.Get(5);
                if(pack.miss){
                    probability = Random.Rangef(cfg.min,cfg.max);
                }else{
@@ -200,7 +221,8 @@ export class Guessnum implements IRouter {
         console.log("概率");
         console.log(probability);
 
-        m.moneyGeted =Number((pack.money*probability).toFixed(2));
+        let get = Math.floor(pack.money*100*probability);
+        m.moneyGeted =get/100;
 
         if(A==4){
             pack.status=Code.PACK_FINSH;
@@ -222,9 +244,11 @@ export class Guessnum implements IRouter {
                 m.commit=configs.Evaluate.Get(Number(m.markId)).iqwored3;
                 break;
         }
+        let remain =pack.remain;
+        let moneyGeted=m.moneyGeted;
 
-       pack.remain -= m.moneyGeted;
-       pack.remain=Number(pack.remain.toFixed(2));
+       pack.remain =(remain*100-moneyGeted*100)/100
+
         pack.CDList[trans.sid] = new Date().getTime();
         pack.guessCount -= 1;
         await Guessnum.updatePack(pack);
@@ -234,7 +258,7 @@ export class Guessnum implements IRouter {
       //  await Guessnum.saveUserGuessRecord("123",m.guessNum,m.moneyGeted,m.mark,m.pid,m.commit);
 
         let delta = new Delta();
-        delta.addkv(configs.Item.MONEY,m.moneyGeted);
+        delta.addkv(configs.Item.MONEY,m.moneyGeted*100);
         await User.ApplyDelta(ui,delta);
 
         trans.submit();
@@ -393,7 +417,7 @@ export class Guessnum implements IRouter {
     protected static getCode(){
         let psw=new Set();
         while (psw.size < 4) {
-            psw.add(Random.Rangei(0, 0, true))
+            psw.add(Random.Rangei(0, 9, true))
         }
         return Array.from(psw).join('');
     }
@@ -420,32 +444,9 @@ export class Guessnum implements IRouter {
         };
     }
 
-    protected static async savePack(pack:PackInfo, pid:string):Promise<PackInfo>{
-        return await Insert(PackInfo, {
-            pid: pid,
-            uid:pack.userInfo.uid,
-            title:pack.title,
-            money:pack.money,
-            remain:pack.money,
-            password:pack.password,
-            createTime:new Date().toLocaleString(),
-            guessCount:pack.guessCount,
-            useTicket:pack.useTicket,
-            AAAA:false,
-            AAA:false,
-            AA:false,
-            A:false,
-            miss:false,
-            status:Code.PACK_Fighing,
-            CDList:{}
-        });
-    }
+
 
     protected static async getPackInfo(pid:number):Promise<PackInfo>{
-        return await Query(PackInfo,{pid:pid});
-    }
-
-    protected static async getGuessNum(pid:number):Promise<PackInfo>{
         return await Query(PackInfo,{pid:pid});
     }
 

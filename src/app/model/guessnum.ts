@@ -35,7 +35,7 @@ export class PackInfo {
 
     @string(4,[output],"创建时间")
     @colstring()
-    createTime:string;
+    createTime:string =new Date().toLocaleString();
 
     @colstring()
     password:string;
@@ -49,26 +49,26 @@ export class PackInfo {
     useTicket:boolean;
 
     @colboolean()
-    AAAA:boolean;
+    AAAA:boolean =false;
 
     @colboolean()
-    AAA:boolean;
+    AAA:boolean =false;
 
     @colboolean()
-    AA:boolean;
+    AA:boolean =false;
 
     @colboolean()
-    A:boolean;
+    A:boolean =false;
 
     @colboolean()
-    miss:boolean;
+    miss:boolean = false;
 
     @integer(8,[output],"红包状态")
     @colinteger()
     status:number;
 
     @coljson()
-    CDList:any;
+    CDList:any ={};
 
     @string(10,[input,output,optional],"红包标题")
     @colstring()
@@ -257,4 +257,6 @@ export class Acceleration{
 
     @integer(1,[output])
     num:number;
+
+
 }
