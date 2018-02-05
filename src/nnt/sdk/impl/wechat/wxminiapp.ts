@@ -593,8 +593,8 @@ export class WxMiniApp extends Channel {
         wtd.mchid = this.pubmchid;
         wtd.signkey = this.pubkey;
         wtd.check_name="NO_CHECK";
-        //wtd.openid = ui.userid;
-        wtd.openid = "oQq-J5XuO2NawkxByfpkMrOAPmLg";
+        wtd.openid = m.uid;
+       // wtd.openid = "oQq-J5XuO2NawkxByfpkMrOAPmLg";
 
 
         // 计算签名
@@ -608,7 +608,7 @@ export class WxMiniApp extends Channel {
        if (!res) {
             wtd.success = false;
             logger.warn('企业支付到零钱出错,请求params为{{=it.url}}', {url: wtd.requestParams()});
-            Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(wtd));
+            await Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(wtd));
             return false;
         }
 
@@ -625,7 +625,7 @@ export class WxMiniApp extends Channel {
 
         // 保存纪录
         res.success = true;
-        Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(res));
+        await Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(res));
         return true;
     }
 
@@ -640,9 +640,9 @@ export class WxMiniApp extends Channel {
         const api = new tenpay(config);
 
         let result = await api.transfers({
-            partner_trade_no: '111122221',
-            openid: 'oQq-J5ZcDiP_Fa9BIIG370MaOHGI',
-            amount: 110,
+            partner_trade_no: w.partner_trade_no,
+            openid: w.openid,
+            amount: w.amount*100,
             desc: '奖励金提现',
             check_name: 'NO_CHECK'
         });

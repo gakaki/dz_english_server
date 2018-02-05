@@ -228,8 +228,8 @@ export class User implements IRouter {
        }
        let srv = static_cast<Api>(trans.server);
        let payInfo:RechargeRecord = new RechargeRecord();
-      // payInfo.price = m.payCount*100;
-       payInfo.price = 1;
+       payInfo.price = m.payCount*100;
+       //payInfo.price = 1;
        payInfo.time = DateTime.Current();
        payInfo.pid=ui.pid;
       // payInfo.pid = "123";
@@ -272,20 +272,20 @@ export class User implements IRouter {
    @action(MinAppWithdraw)
    async minappwithdraw(trans:Trans){
        let m:MinAppWithdraw = trans.model;
-      /* let ui=await User.FindUserBySid(trans.sid);
+       let ui=await User.FindUserBySid(trans.sid);
        if(ui == null){
            trans.status=Code.USER_NOT_FOUND;
            trans.submit();
            return;
-       }*/
+       }
        let withdraw:Withdraw = new Withdraw();
        withdraw.money = m.money;
        withdraw.channel="wxminiapp";
-     //  withdraw.uid=ui.uid;
-       withdraw.uid="123";
+       withdraw.uid=ui.uid;
+      // withdraw.uid="123";
 
        let a=await  Call("sdk", 'sdk.withdraw', withdraw);
-       console.log(a);
+
        m.data=a.model.data;
        trans.submit();
    }
