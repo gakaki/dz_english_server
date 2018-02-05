@@ -30,7 +30,7 @@ export class Guessnum implements IRouter {
         let m: PackInfo = trans.model;
 
         console.log("请求来了");
-
+        console.log(m.money);
         let ui:UserInfo=await User.FindUserBySid(trans.sid);
 
         if(ui==null){
@@ -38,7 +38,13 @@ export class Guessnum implements IRouter {
             trans.submit();
             return
         }
-       m.userInfo=ui;
+        if(m.money<1){
+            trans.status = Code.NEED_MONEY;
+            m.needmoney = 1;
+            trans.submit();
+            return;
+        }
+
 
         //计算扣除
         let cost = new Delta();
@@ -86,7 +92,7 @@ export class Guessnum implements IRouter {
 
 
         await Insert(PackInfo, m);
-
+        m.userInfo=ui;
 
         setTimeout(async function () {
             console.log("红包要过期了");
