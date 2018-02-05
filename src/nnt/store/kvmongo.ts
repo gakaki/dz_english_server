@@ -191,7 +191,7 @@ export class KvMongo extends AbstractNosql {
         });
     }
 
-    query(page: string, cmd: NosqlCmdType, limit: number,skip:number ,cb: (res: RecordObject[]) => void) {
+    query(page: string, cmd: NosqlCmdType, limit: number,skip:number ,sort:any,cb: (res: RecordObject[]) => void) {
         if (typeof cmd == "string") {
             // 传入了IID
             cmd = {_id: StrToObjectId(cmd)};
@@ -219,6 +219,9 @@ export class KvMongo extends AbstractNosql {
             if (limit > 1)
                 cursor.limit(limit);
             cursor.skip(skip);
+            if(sort){
+                cursor.sort(sort)
+            }
             cursor.toArray((err, rcds) => {
                 if (err) {
                     logerr(err, ["query", cmd]);

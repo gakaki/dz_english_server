@@ -643,7 +643,7 @@ export class WxMiniApp extends Channel {
             partner_trade_no: '111122221',
             openid: 'oQq-J5ZcDiP_Fa9BIIG370MaOHGI',
             amount: 110,
-            desc: '企业付款描述信息',
+            desc: '奖励金提现',
             check_name: 'NO_CHECK'
         });
         console.log(result);
