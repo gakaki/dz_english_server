@@ -7,11 +7,14 @@ import {
     toJsonObject
 } from "../../../core/kernel";
 import {
-    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, PayMethod, SdkUserInfo, Share, Support,
+    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, PayMethod, Refund, SdkUserInfo, Share, Support,
     Withdraw
 } from "../../msdk";
 import {Fast} from "../../../component/encode";
-import {AuthType, WechatGetWxaCode, WechatRefreshToken, WechatToken, WechatUserProfile, WxminiappToken} from "./model";
+import {
+    AuthType, WechatGetWxaCode, WechatRefreshToken, WechatRefundRecord, WechatToken, WechatUserProfile,
+    WxminiappToken
+} from "./model";
 import {RestSession} from "../../../session/rest";
 import {DateTime} from "../../../core/time";
 import {Insert, Query, Update} from "../../../manager/dbmss";
@@ -401,6 +404,8 @@ export class WxMiniApp extends Channel {
         return r;
     }
 
+
+
     async doShare(sa: Share, ui: SdkUserInfo): Promise<boolean> {
         // 如果是ICON分享，则需要返回初始化微信分享用的数据
         return true;
@@ -447,6 +452,27 @@ export class WxMiniApp extends Channel {
         }
 
         return m;
+    }
+    async doRefund(m:Refund):Promise<boolean>{
+        let record:WechatRefundRecord = new WechatRefundRecord();
+        record.orderid=m.orderId;
+        record.out_refund_no=NonceAlDig(10);
+        record.total_fee=m.total_fee;
+        record.refund_fee=m.total_fee;
+        record.desc="红包退回";
+        record.pid=m.pid;
+        record.createTime=DateTime.Current();
+
+        let res = await this.ReqUserRefund(record);
+        if(!res){
+            record.success=false;
+            return false
+        }
+        record.success=true;
+        record.status=res.return_code;
+        logger.info("退款人："+m.pid+"退款金额："+m.total_fee+"退款状态："+res.return_code);
+        await Insert(make_tuple(this._sdk.dbsrv, WechatRefundRecord), Output(record));
+        return true;
     }
 
     async doPay(m: Pay, ui: SdkUserInfo, trans: Transaction): Promise<boolean> {
@@ -508,7 +534,7 @@ export class WxMiniApp extends Channel {
 
         if (!res) {
             wuo.success = false;
-            Insert(make_tuple(this._sdk.dbsrv, WechatUnifiedOrder), Output(wuo));
+            await Insert(make_tuple(this._sdk.dbsrv, WechatUnifiedOrder), Output(wuo));
             return false;
         }
 
@@ -562,7 +588,7 @@ export class WxMiniApp extends Channel {
 
         // 保存纪录
         res.success = true;
-        Insert(make_tuple(this._sdk.dbsrv, WechatUnifiedOrder), Output(res));
+        await Insert(make_tuple(this._sdk.dbsrv, WechatUnifiedOrder), Output(res));
 
         return true;
     }
@@ -627,6 +653,26 @@ export class WxMiniApp extends Channel {
         res.success = true;
         await Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(res));
         return true;
+    }
+    async ReqUserRefund(m:WechatRefundRecord):Promise<IndexedObject>{
+        const config = {
+            appid: this.appid,
+            mchid: this.pubmchid,
+            partnerKey: this.pubkey,
+            pfx: fs.readFileSync(expand(Config.WX_P12)),
+            spbill_create_ip: '10.1.70.71'
+        };
+        const api = new tenpay(config);
+
+        let result = await api.refund({
+            op_user_id:this.pubid,
+            out_refund_no:m.out_refund_no,
+            out_trade_no: m.orderid,
+            total_fee: m.total_fee,
+            refund_fee: m.total_fee,
+        });
+        console.log(result);
+        return result;
     }
 
     async ReqPaytoUser(w: WxappPaytoUser): Promise<IndexedObject> {

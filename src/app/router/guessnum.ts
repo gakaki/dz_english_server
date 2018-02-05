@@ -19,6 +19,11 @@ import {AppConfig} from "../model/appconfig";
 import {async} from "../../nnt/core/proto";
 import * as fs from "fs";
 import {logger} from "../../nnt/core/logger";
+import {models} from "../../contrib/manager/api/api";
+import {RechargeRecord} from "../model/shop";
+import {Call} from "../../nnt/manager/servers";
+import {Refund} from "../../nnt/sdk/msdk";
+
 
 
 
@@ -39,13 +44,6 @@ export class Guessnum implements IRouter {
             trans.submit();
             return
         }
-        if(m.money<1){
-            trans.status = Code.NEED_MONEY;
-            m.needmoney = 1;
-            trans.submit();
-            return;
-        }
-
 
 
         //计算扣除
@@ -59,25 +57,15 @@ export class Guessnum implements IRouter {
            // m.money -= 100;//代金券抵1元
             //扣代金券
             cost.addkv(configs.Item.CASHCOUPON, -1);
-        }
-        //扣钱数
-        cost.addkv(configs.Item.MONEY, m.money*100*-1);
+        }/*else{
+            //扣钱数
+            cost.addkv(configs.Item.MONEY, m.money*100*-1);
+        }*/
+
         //获得加速卡
 
         cost.addkv(configs.Item.ACCELERATION,2);
 
-
-
-        let need = Delta.NeedItems(cost.items, ui.items);
-
-        console.log(need);
-        //钱数不足，客户端根据错误码跳支付
-        if (need.size) {
-            trans.status = Code.NEED_MONEY;
-            m.needmoney = m.money;
-            trans.submit();
-            return;
-        }
 
         //钱数OK,
         let pid = DateTime.Current();
@@ -109,9 +97,15 @@ export class Guessnum implements IRouter {
             console.log(pack);
             pack.status=Code.PACK_EXPIRED;
             await Guessnum.updatePack(pack);
-            let cost = new Delta();
-            cost.addkv(configs.Item.MONEY, pack.remain);
-            await User.ApplyDelta(ui, cost);
+            let records=await Guessnum.getPackGuessRecords(m.pid);
+            if(records && records.length>0){
+                let cost = new Delta();
+                cost.addkv(configs.Item.MONEY, (pack.remain)*100);
+                await User.ApplyDelta(ui, cost);
+            }else{
+                await Guessnum.refund(ui.pid);
+            }
+
 
         },Number(configs.Parameter.Get("expire").value)*60*60*1000);
 
@@ -594,6 +588,25 @@ export class Guessnum implements IRouter {
             return null;
         }
 
+    }
+
+    protected static async refund(pid:string){
+        let rechargeRecord =await Query(RechargeRecord,{"pid":pid});
+        if(rechargeRecord == null){
+            return false;
+        }
+        let refund:Refund = new Refund();
+        refund.pid=pid;
+        refund.orderId=rechargeRecord.orderid;
+        refund.total_fee=rechargeRecord.price;
+        refund.channel="wxminiapp";
+        let re=await  Call("sdk", 'sdk.refund', refund);
+
+        if(re.model.success){
+            return true
+        }
+
+        return false;
     }
 
 

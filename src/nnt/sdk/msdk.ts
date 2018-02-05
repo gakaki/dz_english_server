@@ -1,5 +1,5 @@
 import {
-    array, double, file, input, integer, integer_t, json, model, optional, output, string, string_t,
+    array, boolean, double, file, input, integer, integer_t, json, model, optional, output, string, string_t,
     type
 } from "../core/proto";
 import {ArrayT, IndexedObject, MAX_INT} from "../core/kernel";
@@ -259,6 +259,26 @@ export class PayRecord {
     @json(9, [output], "客户端调用payservice的数据")
     @coljson()
     payload: IndexedObject;
+}
+
+@model()
+export class Refund{
+    @string(1,[input])
+    orderId:string;
+
+    @integer(2,[input])
+    total_fee:number;
+
+    @string(3,[input])
+    channel:string;
+
+    @string(4,[input])
+    pid:string;
+
+    @boolean(5,[output])
+    success:boolean;
+
+
 }
 
 @model()

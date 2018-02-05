@@ -1,7 +1,7 @@
 import {Channel} from "../../channel";
 import {IndexedObject} from "../../../core/kernel";
 import {
-    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, SdkUserInfo, Share, Support,
+    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, Refund, SdkUserInfo, Share, Support,
     Withdraw
 } from "../../msdk";
 import {RegisterChannel, Sdk} from "../../sdk";
@@ -9,6 +9,9 @@ import {Transaction} from "../../../server/transaction";
 import {MinAppShare} from "../../../../app/model/user";
 
 export class Phone extends Channel {
+    doRefund(m: Refund): Promise<boolean> {
+        return undefined;
+    }
 
 
     constructor(sdk: Sdk) {

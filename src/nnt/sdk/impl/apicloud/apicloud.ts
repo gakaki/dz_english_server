@@ -1,7 +1,8 @@
 import {Channel} from "../../channel";
 import {AsyncArray, IndexedObject, Mask, toJsonObject} from "../../../core/kernel";
 import {
-    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, LoginMethod, Pay, PayMethod, SdkUserInfo, Share,
+    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, LoginMethod, Pay, PayMethod, Refund, SdkUserInfo,
+    Share,
     Support, Withdraw
 } from "../../msdk";
 import {RegisterChannel, Sdk} from "../../sdk";
@@ -11,6 +12,9 @@ import {MediaSupport} from "../../../server/mediastore";
 import {MinAppShare} from "../../../../app/model/user";
 
 export class Apicloud extends Channel {
+    doRefund(m: Refund): Promise<boolean> {
+        return undefined;
+    }
 
 
     constructor(sdk: Sdk) {

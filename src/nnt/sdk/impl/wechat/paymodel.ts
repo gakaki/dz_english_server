@@ -345,4 +345,7 @@ export class WxappPaytoUser extends WechatPayModel{
         return "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
     }
 
+
+
+
 }
