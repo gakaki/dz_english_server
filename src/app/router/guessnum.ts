@@ -84,7 +84,10 @@ export class Guessnum implements IRouter {
         m.uid=ui.uid;
       //  m.uid="123";
         m.password = Guessnum.getCode();
-        m.remain = m.money;
+        let money=m.money;
+        m.money=money*100;
+        m.remain = money*100;
+        console.log(m);
         m.status = Code.PACK_Fighing;
 
 
