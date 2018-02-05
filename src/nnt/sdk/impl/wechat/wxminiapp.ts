@@ -32,14 +32,9 @@ import {S2SWechatTicket, S2SWechatToken} from "./s2smodel";
 import {ACROOT} from "../../../acl/acl";
 import {MinAppShare} from "../../../../app/model/user";
 import * as fs from "fs";
-import {User} from "../../../../app/router/user";
-import xml = require("xmlbuilder");
-import xml2js = require("xml2js");
 import moment = require("moment");
-import * as https from "https";
 import {Config} from "../../../manager/config";
 import {expand} from "../../../core/url";
-import * as request from "request";
 const tenpay:AnyClass = require('tenpay');
 
 
@@ -597,14 +592,6 @@ export class WxMiniApp extends Channel {
         return `withdraw${DateTime.Current()}`;
     }
 
-    protected static buildXML(json:any){
-            var builder = new xml2js.Builder({rootName:'xml', cdata: true});
-            return builder.buildObject(json);
-    };
-    protected static parseXML (xml:any, fn:any){
-        var parser = new xml2js.Parser({ trim:true, explicitArray:false, explicitRoot:false });
-        parser.parseString(xml, fn||function(err:Error, result:any){});
-    };
 
     async doWithdraw(m: Withdraw, ui: SdkUserInfo): Promise<boolean> {
         let wtd: WxappPaytoUser = new WxappPaytoUser();
@@ -636,7 +623,9 @@ export class WxMiniApp extends Channel {
             logger.warn('企业支付到零钱出错,请求params为{{=it.url}}', {url: wtd.requestParams()});
             await Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(wtd));
             return false;
-        }
+        }else{
+           wtd.success=true;
+       }
 
         //组装返回的数据
         // m.payload = {
@@ -650,7 +639,7 @@ export class WxMiniApp extends Channel {
         // m.payload.paySign = this.doSignaturePay(fields, wtd.signkey);
 
         // 保存纪录
-        res.success = true;
+
         await Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(res));
         return true;
     }
@@ -664,6 +653,7 @@ export class WxMiniApp extends Channel {
         };
         const api = new tenpay(config);
 
+
         let result = await api.refund({
             op_user_id:this.pubid,
             out_refund_no:m.out_refund_no,
@@ -675,7 +665,7 @@ export class WxMiniApp extends Channel {
         return result;
     }
 
-    async ReqPaytoUser(w: WxappPaytoUser): Promise<IndexedObject> {
+    async ReqPaytoUser(w: WxappPaytoUser): Promise<boolean> {
         const config = {
             appid: this.appid,
             mchid: w.mchid,
@@ -685,15 +675,22 @@ export class WxMiniApp extends Channel {
         };
         const api = new tenpay(config);
 
-        let result = await api.transfers({
-            partner_trade_no: w.partner_trade_no,
-            openid: w.openid,
-            amount: Math.floor(w.amount*100*0.98),
-            desc: '奖励金提现',
-            check_name: 'NO_CHECK'
-        });
-        console.log(result);
-        return result;
+        try{
+            let result = await api.transfers({
+                partner_trade_no: w.partner_trade_no,
+                openid: w.openid,
+                amount: Math.floor(w.amount*100*0.98),
+                desc: '奖励金提现',
+                check_name: 'NO_CHECK'
+            });
+            console.log(result);
+            return true;
+        }catch (err){
+            logger.warn("提现失败"+err);
+            return false;
+        }
+
+
     }
 
     protected doSignaturePay(fields: Map<string, any>, key: string): string {
