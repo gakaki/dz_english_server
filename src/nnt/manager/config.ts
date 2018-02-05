@@ -31,6 +31,7 @@ export module Config {
     export let HTTPS_CERT: string;
     export let HTTPS_PFX: string;
     export let HTTPS_PASSWD: string;
+    export let WX_P12:string;
 
     // 用于DES的密钥，只能在开服时修改，不然修改前产生的数据都会解密失败
     export let DES_KEY: string = "0i923,dfau9o8";

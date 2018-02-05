@@ -81,6 +81,9 @@ export class App {
                 Config.HTTPS_PFX = c.httpspfx;
             if (c.httpspasswd)
                 Config.HTTPS_PASSWD = c.httpspasswd;
+            if (c.wxp12) {
+                Config.WX_P12 = c.wxp12;
+            }
             if (c.deskey)
                 Config.DES_KEY = c.deskey;
             if (c.cluster != null) {

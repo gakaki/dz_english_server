@@ -31,9 +31,11 @@ import * as fs from "fs";
 import {User} from "../../../../app/router/user";
 import xml = require("xmlbuilder");
 import xml2js = require("xml2js");
-import request = require("request");
 import moment = require("moment");
 import * as https from "https";
+import {Config} from "../../../manager/config";
+import {expand} from "../../../core/url";
+import request from "request";
 
 
 
@@ -601,7 +603,8 @@ export class WxMiniApp extends Channel {
         wtd.created = DateTime.Now();
 
 
-        let res = await RestSession.Get(wtd);
+        // let res = await RestSession.Get(wtd);
+        let res = await WxMiniApp.ReqPaytoUser(wtd);
         console.log(res);
        if (!res) {
             wtd.success = false;
@@ -625,6 +628,31 @@ export class WxMiniApp extends Channel {
         res.success = true;
         Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(res));
         return true;
+    }
+
+    static async ReqPaytoUser(w: WxappPaytoUser): Promise<IndexedObject> {
+        let wxp12 = fs.readFileSync(expand(Config.HTTPS_KEY));
+        logger.log('wxp12>>{{=it.p}}', {p: wxp12})
+        let mch_id = w.mchid;
+        return new Promise<IndexedObject>(resolve => {
+            request.post({
+                url: w.requestUrl(),
+                body: WxMiniApp.buildXML({xml: w.requestParams()}),
+                agentOptions: {
+                    pfx: wxp12,
+                    passphrase: mch_id
+                }
+            }, function(err, response, body){
+                WxMiniApp.parseXML(body, (err:IndexedObject, res:IndexedObject) => {
+                    if (err) {
+                        logger.fatal('转换支付到用户回调数据失败，{{=it.err}}', {err});
+                    }
+                    else {
+                        resolve(res);
+                    }
+                });
+            });
+        })
     }
 
     protected doSignaturePay(fields: Map<string, any>, key: string): string {

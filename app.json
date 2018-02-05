@@ -8,6 +8,7 @@
     "httpskey": "config/server.key",
     "httpscert": "config/server.pem",
     "ca":"config/rootca.pem",
+    "wxp12": "config/apiclient_cert.p12",
     "imsrv": "im",
     "mqsrv": "amqp",
     "deskey": "231m,l/.",
