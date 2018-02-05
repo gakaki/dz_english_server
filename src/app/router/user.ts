@@ -301,6 +301,7 @@ export class User implements IRouter {
 
        let a=await  Call("sdk", 'sdk.withdraw', withdraw);
 
+       console.log(a);
        m.data=a.model.data;
        console.log("返回");
        console.log(m);

@@ -394,6 +394,8 @@ export class RSdk implements IRouter {
         }
 
         let ok = chann.doWithdraw(m, rcd);
+        console.log("中间返回");
+        console.log(ok);
         if (!ok) {
             trans.status = STATUS.FAILED;
         }
