@@ -683,7 +683,7 @@ export class WxMiniApp extends Channel {
                 desc: '奖励金提现',
                 check_name: 'NO_CHECK'
             });
-            console.log(result);
+
             return true;
         }catch (err){
             logger.warn("提现失败"+err);

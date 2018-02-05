@@ -302,6 +302,11 @@ export class User implements IRouter {
        let a=await  Call("sdk", 'sdk.withdraw', withdraw);
 
        m.data=a.model.data;
+       console.log("返回");
+       console.log(m);
+       let cost = new Delta();
+       cost.addkv(configs.Item.MONEY, m.money*100);
+       await User.ApplyDelta(ui, cost);
        trans.submit();
    }
 
@@ -371,8 +376,8 @@ export class User implements IRouter {
         // 初始化新用户背包
         let delta = new Delta();
          delta.addkv(configs.Item.MONEY, 0);
-         delta.addkv(configs.Item.ACCELERATION, 1000);
-         delta.addkv(configs.Item.CASHCOUPON, 1000);
+         delta.addkv(configs.Item.ACCELERATION, 0);
+         delta.addkv(configs.Item.CASHCOUPON, 0);
         // delta.addkv(configs.Item.SHENJIA, toInt(configs.Parameter.Get("user.initialshenjia").value));
         // delta.addkv(configs.Item.GOLD, toInt(configs.Parameter.Get("user.initialgold").value));
         // delta.addkv(configs.Item.PHYSICAL, toInt(configs.Parameter.Get("user.initialtili").value));

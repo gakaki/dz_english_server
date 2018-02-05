@@ -119,12 +119,12 @@ export class Guessnum implements IRouter {
     @action(Guess)
     async guesspack(trans:Trans){
         let m:Guess=trans.model;
-        let ui:UserInfo=await User.FindUserBySid(trans.sid);
+      /*  let ui:UserInfo=await User.FindUserBySid(trans.sid);
         if(ui==null){
             trans.status = Code.USER_NOT_FOUND;
             trans.submit();
             return
-        }
+        }*/
         let pack=await Guessnum.getGuessPack(m.pid);
         if(pack == null){
             trans.status = Code.PACK_EMPTY;
@@ -266,13 +266,13 @@ export class Guessnum implements IRouter {
         pack.guessCount -= 1;
         await Guessnum.updatePack(pack);
 
-        await Guessnum.saveUserGuessRecord(ui.uid,m.guessNum,m.moneyGeted,m.mark,m.pid,m.commit);
+    //    await Guessnum.saveUserGuessRecord(ui.uid,m.guessNum,m.moneyGeted,m.mark,m.pid,m.commit);
       //  await Guessnum.saveUserGuessRecord("123",m.guessNum,m.moneyGeted,m.mark,m.pid,m.commit);
 
-        let delta = new Delta();
+     /*   let delta = new Delta();
         delta.addkv(configs.Item.MONEY,m.moneyGeted);
         await User.ApplyDelta(ui,delta);
-
+*/
         trans.submit();
     }
     //清除等待CD
