@@ -464,7 +464,7 @@ export class WxMiniApp extends Channel {
             wuo.spbill_create_ip = trans.info.addr;
         }
 
-        wuo.notify_url = this.noticeurl + "/method/" + m.method + "/channel/wechat"; // 会变成参数传递给completePay接口，用来判断是哪个渠道发来的回调
+        wuo.notify_url = this.noticeurl + "/method/" + m.method + "/channel/wxminiapp"; // 会变成参数传递给completePay接口，用来判断是哪个渠道发来的回调
 
         if (m.method == PayMethod.WECHAT_PUB) {
             wuo.appid = this.pubid;
@@ -642,10 +642,10 @@ export class WxMiniApp extends Channel {
     }
 
     async doCompletePay(m: CompletePay, trans: Transaction): Promise<boolean> {
+        console.log("支付回掉微信层+++++++++");
         // 重建数据模型
         let wpr = new WechatPayResult();
         Decode(wpr, trans.params);
-
         // 构造应答数据，由业务层应答
         m.respn = {
             contentType: "text/xml",
@@ -655,13 +655,16 @@ export class WxMiniApp extends Channel {
         // 判断微信发过来的支持情况
         if (wpr.result_code != "SUCCESS") {
             wpr.status = STATUS.FAILED;
-            Insert(make_tuple(this._sdk.dbsrv, WechatPayResult), wpr);
+            await Insert(make_tuple(this._sdk.dbsrv, WechatPayResult), wpr);
             return false;
         }
 
         let signkey: string;
         if (m.method == PayMethod.WECHAT_PUB) {
             signkey = this.pubkey;
+        }
+        else if(m.method ==PayMethod.WECHAT_MINAPP){
+            signkey =this.pubkey;
         }
         else {
             signkey = this.paykey;
@@ -670,19 +673,23 @@ export class WxMiniApp extends Channel {
         // 验证微信发起的签名
         let fields = ObjectT.ToMap(ApiOutput(wpr));
         let sign = this.doSignaturePay(fields, signkey);
+        console.log("验证签名");
+        console.log(sign);
+        console.log(wpr.sign);
         if (sign != wpr.sign) {
             wpr.status = STATUS.SIGNATURE_ERROR;
-            Insert(make_tuple(this._sdk.dbsrv, WechatPayResult), wpr);
+            await Insert(make_tuple(this._sdk.dbsrv, WechatPayResult), wpr);
             return false;
         }
 
         wpr.status = STATUS.OK;
-        Insert(make_tuple(this._sdk.dbsrv, WechatPayResult), wpr);
+        await Insert(make_tuple(this._sdk.dbsrv, WechatPayResult), wpr);
 
         // 查询该订单的价格是否一致
         let rcd = await Query(make_tuple(this._sdk.dbsrv, Pay), {
             orderid: wpr.out_trade_no
         });
+
         if (!rcd) {
             logger.log("没有查找到该微信订单 " + wpr.out_trade_no);
             return false;
@@ -695,7 +702,7 @@ export class WxMiniApp extends Channel {
 
         // 支付成功
         m.orderid = wpr.out_trade_no;
-
+        console.log("支付成功！！！！！！！！！！！！");
         // 签名成功
         return true;
     }

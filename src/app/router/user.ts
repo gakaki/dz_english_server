@@ -228,9 +228,10 @@ export class User implements IRouter {
        }
        let srv = static_cast<Api>(trans.server);
        let payInfo:RechargeRecord = new RechargeRecord();
-       payInfo.price = m.payCount*100;
+      // payInfo.price = m.payCount*100;
+       payInfo.price = 1;
        payInfo.time = DateTime.Current();
-       payInfo.pid=ui.uid;
+       payInfo.pid=ui.pid;
       // payInfo.pid = "123";
        payInfo.type = "recharge";
        let t = await Call(srv.sdksrv, "sdk.payorderid", trans.params);
@@ -246,7 +247,7 @@ export class User implements IRouter {
 
        payInfo.desc = "豆子网络-游戏";
 
-       await Insert(RechargeRecord, m);
+       await Insert(RechargeRecord, payInfo);
 
        let pay:Pay = new Pay();
        pay.method=PayMethod.WECHAT_MINAPP;
@@ -354,7 +355,7 @@ export class User implements IRouter {
 
         // 初始化新用户背包
         let delta = new Delta();
-         delta.addkv(configs.Item.MONEY, 100000);
+         delta.addkv(configs.Item.MONEY, 0);
          delta.addkv(configs.Item.ACCELERATION, 1000);
          delta.addkv(configs.Item.CASHCOUPON, 1000);
         // delta.addkv(configs.Item.SHENJIA, toInt(configs.Parameter.Get("user.initialshenjia").value));

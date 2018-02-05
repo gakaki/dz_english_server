@@ -75,6 +75,7 @@ export class Shop implements IRouter {
 
     @action(Null, [], "支付成功回调")
     async done(trans: Trans) {
+        console.log("支付回掉");
         let srv = static_cast<Api>(trans.server);
         let t = await Call(srv.sdksrv, "sdk.completepay", trans.params);
         if (t.status != STATUS.OK) {
@@ -86,7 +87,7 @@ export class Shop implements IRouter {
         let m: CompletePay = t.model;
 
         // 处理充值
-        this.doCompleteRecharge(m.orderid);
+        await this.doCompleteRecharge(m.orderid);
 
         // 回应外部
         if (m.respn)
@@ -106,20 +107,25 @@ export class Shop implements IRouter {
 
         let ui = await User.FindUserInfo(rcd.pid);
         let delta = Delta.Item(Item.FromIndex(configs.Item.MONEY)).record(ItemRecordType.BUY);
-
+        console.log("用户当前金额");
+        let i=await ui.itemCount(1);
+        console.log(i);
         // 修改充值次数和金额
         delta.addkv(configs.Item.MONEY, rcd.price);
 
         // 添加到背包，并发出消息，客户端会自己调用userinfo来刷新
-        User.ApplyDelta(ui, delta.record(ItemRecordType.BUY));
+        await User.ApplyDelta(ui, delta.record(ItemRecordType.BUY));
 
-        // 发送到账消息
-        Msg.SysChat({
-            from: mid_str(SYSTEM, DOMAIN_USERS),
-            to: mid_str(ui.pid, DOMAIN_USERS),
-            type: ImMsgType.CHAT,
-            payload: new ImChatMsg(ImMsgSubType.PAY_DONE)
-        });
+        console.log("充值到账");
+        let u=await User.FindUserInfo(rcd.pid);
+        console.log(u);
+        /*   // 发送到账消息
+           Msg.SysChat({
+               from: mid_str(SYSTEM, DOMAIN_USERS),
+               to: mid_str(ui.pid, DOMAIN_USERS),
+               type: ImMsgType.CHAT,
+               payload: new ImChatMsg(ImMsgSubType.PAY_DONE)
+           });*/
 
         //到账消息通过websocket通知。。
 
