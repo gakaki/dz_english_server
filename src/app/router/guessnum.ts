@@ -10,7 +10,7 @@ import {UserInfo} from "../model/user";
 import {User} from "./user";
 import {Code} from "../model/code";
 import {ArrayT, Random} from "../../nnt/core/kernel";
-import {Aggregate, Count, Insert, Query, QueryAll, Update} from "../../nnt/manager/dbmss";
+import {Aggregate, Count, Insert, Query, QueryAll, Update, Value} from "../../nnt/manager/dbmss";
 import {DateTime} from "../../nnt/core/time";
 import {configs} from "../model/xlsconfigs";
 import {Delta} from "../model/item";
@@ -19,6 +19,9 @@ import {AppConfig} from "../model/appconfig";
 import {async} from "../../nnt/core/proto";
 import * as fs from "fs";
 import {logger} from "../../nnt/core/logger";
+import {AbstractCronTask} from "../../nnt/manager/crons";
+import {CURRENT_HOUR_RANGE} from "../../nnt/component/today";
+import {StatisOnlineUsersCount, StatisUserOnlineCount} from "../model/statis";
 
 
 
@@ -597,4 +600,11 @@ export class Guessnum implements IRouter {
     }
 
 
+}
+
+class PackExpireCheckTask extends AbstractCronTask {
+    async main() {
+        //待优化，使用计划任务处理过期红包
+
+    }
 }
