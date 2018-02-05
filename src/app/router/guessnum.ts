@@ -131,7 +131,6 @@ export class Guessnum implements IRouter {
         let time= new Date(pack.createTime);
 
         if(time.getTime() +Number(configs.Parameter.Get("expire").value)*60*60*1000 <= new Date().getTime()){
-            console.log(new Date().getTime());
             trans.status = Code.PACK_EXPIRED;
             await Guessnum.updatePackStatus(pack.pid,Code.PACK_EXPIRED);
             trans.submit();
@@ -152,9 +151,6 @@ export class Guessnum implements IRouter {
 
         if(pack.CDList){
             if(pack.CDList[trans.sid]){
-                console.log(pack.CDList[trans.sid]);
-                console.log(pack.CDList[trans.sid]+Number(configs.Parameter.Get("waitcd").value)*1000);
-                console.log(new Date().getTime());
                 if(pack.CDList[trans.sid]+Number(configs.Parameter.Get("waitcd").value)*1000 >= new Date().getTime()){
                     trans.status = Code.PACK_ISCD;
                     m.restTime=new Date(pack.CDList[trans.sid]+Number(configs.Parameter.Get("waitcd").value)*1000-new Date().getTime()).toTimeString();
@@ -186,7 +182,6 @@ export class Guessnum implements IRouter {
                break;
            case 3:
                let cfgAAA= configs.Distribution.Get(3);
-               console.log(cfgAAA);
                if(pack.AAA){
                    probability = Random.Rangef(cfgAAA.min,cfgAAA.max);
                }else{
@@ -205,7 +200,6 @@ export class Guessnum implements IRouter {
                break;
            case 1:
                let cfgA= configs.Distribution.Get(1);
-               console.log(cfgA);
                if(pack.A){
                    probability = Random.Rangef(cfgA.min,cfgA.max);
                }else{
@@ -332,7 +326,6 @@ export class Guessnum implements IRouter {
         m.packInfo=pack;
         let records=await Guessnum.getPackGuessRecords(m.pid);
         m.records=records;
-        console.log(m);
         trans.submit();
 
     }
