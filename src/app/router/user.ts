@@ -25,7 +25,7 @@ import {logger} from "../../nnt/core/logger";
 import {UserBriefInfo, UserVipInfo} from "../model/common";
 import {IApiServer} from "../../nnt/server/apiserver";
 import {AbstractCronTask, CronAdd, PerDay} from "../../nnt/manager/crons";
-import {Auth, LoginMethod, Pay, PayMethod, SdkPayOrderId, SdkUserInfo, Withdraw} from "../../nnt/sdk/msdk";
+import {Auth, LoginMethod, Pay, PayMethod, Refund, SdkPayOrderId, SdkUserInfo, Withdraw} from "../../nnt/sdk/msdk";
 import {REGEX_PHONE} from "../../nnt/component/pattern";
 import {configs} from "../model/xlsconfigs";
 import {Api} from "../server/api";
@@ -266,6 +266,21 @@ export class User implements IRouter {
            return
        }
        m.payload=a.model.payload;
+       trans.submit();
+   }
+   @action(Refund)
+   async refund(trans:Trans){
+        let m:Refund=trans.model;
+        let pid="160031";
+       console.log("进来");
+       console.log(m);
+       //  let orderId="201802050000000153";
+     //   let price=1;
+     //   let refund:Refund= new Refund();
+     //   refund.total_fee=price;
+      //  refund.orderId=orderId;
+     //  refund.channel="wxminiapp";
+       let a=await  Call("sdk", 'sdk.refund', m);
        trans.submit();
    }
 

@@ -1,6 +1,6 @@
 import {action, IRouter} from "../core/router";
 import {
-    Auth, CheckExpire, CompletePay, Environment, GetRemoteMedia, Info, Login, LoginMethod, Pay, PayMethod,
+    Auth, CheckExpire, CompletePay, Environment, GetRemoteMedia, Info, Login, LoginMethod, Pay, PayMethod, Refund,
     SdkPayOrderId, SdkUserInfo, Share, ShareMethod, Support, Withdraw
 } from "./msdk";
 import {Sdk} from "./sdk";
@@ -222,6 +222,26 @@ export class RSdk implements IRouter {
 
 
     }
+    @action(Refund)
+    async refund(trans:Transaction){
+        let m:Refund=trans.model;
+        console.log("转发");
+        let chann = this._sdk.channel(m.channel);
+        if (!chann) {
+            logger.warn("sdk: 没有找到channel " + m.channel);
+            trans.status = STATUS.TARGET_NOT_FOUND;
+            trans.submit();
+            return;
+        }
+        if (!await chann.doRefund(m)) {
+            m.success = false;
+            trans.status = STATUS.THIRD_FAILED;
+            trans.submit();
+            return;
+        }
+        m.success=true;
+        trans.submit();
+    }
 
     @action(Pay, [], "服务端给渠道下单，返回客户端支付数据发起客户端支付")
     async pay(trans: Transaction) {
@@ -254,7 +274,7 @@ export class RSdk implements IRouter {
 
         if (trans.status == STATUS.OK) {
             // 保存到预支付的表中，用来验证支付时验证订单
-            Insert(make_tuple(this._sdk.dbsrv, Pay), m);
+            await Insert(make_tuple(this._sdk.dbsrv, Pay), m);
         }
 
         trans.submit();

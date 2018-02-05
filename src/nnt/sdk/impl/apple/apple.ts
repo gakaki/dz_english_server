@@ -1,7 +1,7 @@
 import {Channel} from "../../channel";
 import {IndexedObject, make_tuple} from "../../../core/kernel";
 import {
-    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, SdkUserInfo, Share, Support,
+    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, Refund, SdkUserInfo, Share, Support,
     Withdraw
 } from "../../msdk";
 import {RegisterChannel, Sdk} from "../../sdk";
@@ -22,6 +22,9 @@ interface AppleCfg {
 }
 
 export class Apple extends Channel {
+    doRefund(m: Refund): Promise<boolean> {
+        return undefined;
+    }
 
 
     constructor(sdk: Sdk) {

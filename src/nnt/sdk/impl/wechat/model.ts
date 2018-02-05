@@ -5,7 +5,7 @@ import {
 } from "../../../core/proto";
 import {Base, HttpContentType, HttpMethod, IResponseData, RequestParams} from "../../../session/model";
 import {logger} from "../../../core/logger";
-import {colarray, coldouble, colinteger, colstring, table} from "../../../store/proto";
+import {colarray, colboolean, coldouble, colinteger, colstring, table} from "../../../store/proto";
 import {SdkUserInfo, Support} from "../../msdk";
 
 
@@ -296,4 +296,36 @@ export class WechatGetWxaCode extends Base{
     @array(5,Object,[output])
     reqBodyBytes:any[]
 
+}
+
+@model()
+@table('', 'wechat_refund_record')
+export class WechatRefundRecord{
+    @colstring()
+    orderid:string;
+
+    @colstring()
+    out_refund_no:string;
+
+    @colinteger()
+    total_fee:number;
+
+    @colinteger()
+    refund_fee:number;
+
+    @colstring()
+    desc:string;
+
+    @colstring()
+    pid:string;
+
+    @colinteger()
+    createTime:number;
+
+    @colstring()
+    status:string;
+
+
+    @colboolean()
+    success: boolean; // 订单下单成功还是失败
 }

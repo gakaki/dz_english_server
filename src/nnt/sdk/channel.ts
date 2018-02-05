@@ -1,7 +1,7 @@
 import {IndexedObject} from "../core/kernel";
 import {Sdk} from "./sdk";
 import {
-    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, PaytoUser, SdkUserInfo, Share,
+    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, Pay, PaytoUser, Refund, SdkUserInfo, Share,
     Support, Withdraw
 } from "./msdk";
 import {Transaction} from "../server/transaction";
@@ -55,6 +55,8 @@ export abstract class Channel {
 
     //微信小程序分享二维码
     abstract doMinAppShare(m: MinAppShare, ui?: SdkUserInfo):Promise<any>;
+
+    abstract doRefund(m:Refund):Promise<boolean>;
 
     protected _sdk: Sdk;
 }

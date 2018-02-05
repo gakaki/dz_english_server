@@ -6,7 +6,8 @@ import {
     toJsonObject
 } from "../../../core/kernel";
 import {
-    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, LoginMethod, Pay, PayMethod, SdkUserInfo, Share,
+    Auth, CompletePay, Environment, GetRemoteMedia, Info, Login, LoginMethod, Pay, PayMethod, Refund, SdkUserInfo,
+    Share,
     Support, Withdraw
 } from "../../msdk";
 import {Fast} from "../../../component/encode";
@@ -29,6 +30,9 @@ import {ACROOT} from "../../../acl/acl";
 import {MinAppShare} from "../../../../app/model/user";
 
 export class Wechat extends Channel {
+    doRefund(m: Refund): Promise<boolean> {
+        return undefined;
+    }
 
 
     constructor(sdk: Sdk) {

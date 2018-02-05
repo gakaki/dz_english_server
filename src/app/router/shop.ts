@@ -107,18 +107,18 @@ export class Shop implements IRouter {
 
         let ui = await User.FindUserInfo(rcd.pid);
         let delta = Delta.Item(Item.FromIndex(configs.Item.MONEY)).record(ItemRecordType.BUY);
-        console.log("用户当前金额");
-        let i=await ui.itemCount(1);
-        console.log(i);
+     //   console.log("用户当前金额");
+    //    let i=await ui.itemCount(1);
+    //    console.log(i);
         // 修改充值次数和金额
-        delta.addkv(configs.Item.MONEY, rcd.price);
+     //   delta.addkv(configs.Item.MONEY, rcd.price);
 
         // 添加到背包，并发出消息，客户端会自己调用userinfo来刷新
-        await User.ApplyDelta(ui, delta.record(ItemRecordType.BUY));
+     //   await User.ApplyDelta(ui, delta.record(ItemRecordType.BUY));
 
-        console.log("充值到账");
-        let u=await User.FindUserInfo(rcd.pid);
-        console.log(u);
+       // console.log("充值到账");
+     //   let u=await User.FindUserInfo(rcd.pid);
+    //    console.log(u);
         /*   // 发送到账消息
            Msg.SysChat({
                from: mid_str(SYSTEM, DOMAIN_USERS),
