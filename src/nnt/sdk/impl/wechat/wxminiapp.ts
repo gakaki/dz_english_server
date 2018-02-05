@@ -2,6 +2,7 @@ import url = require("url");
 import {Channel} from "../../channel";
 import {RegisterChannel, Sdk} from "../../sdk";
 import {
+    AnyClass,
     AsyncArray, getServerIp, IndexedObject, make_tuple, ObjectT, StringT, toJson,
     toJsonObject
 } from "../../../core/kernel";
@@ -35,9 +36,8 @@ import moment = require("moment");
 import * as https from "https";
 import {Config} from "../../../manager/config";
 import {expand} from "../../../core/url";
-import request from "request";
-
-
+import * as request from "request";
+const tenpay:AnyClass = require('tenpay');
 
 
 export class WxMiniApp extends Channel {
@@ -572,7 +572,7 @@ export class WxMiniApp extends Channel {
     }
 
     protected static buildXML(json:any){
-            var builder = new xml2js.Builder();
+            var builder = new xml2js.Builder({rootName:'xml', cdata: true});
             return builder.buildObject(json);
     };
     protected static parseXML (xml:any, fn:any){
@@ -603,8 +603,7 @@ export class WxMiniApp extends Channel {
         wtd.created = DateTime.Now();
 
 
-        // let res = await RestSession.Get(wtd);
-        let res = await WxMiniApp.ReqPaytoUser(wtd);
+        let res = await this.ReqPaytoUser(wtd);
         console.log(res);
        if (!res) {
             wtd.success = false;
@@ -630,29 +629,25 @@ export class WxMiniApp extends Channel {
         return true;
     }
 
-    static async ReqPaytoUser(w: WxappPaytoUser): Promise<IndexedObject> {
-        let wxp12 = fs.readFileSync(expand(Config.HTTPS_KEY));
-        logger.log('wxp12>>{{=it.p}}', {p: wxp12})
-        let mch_id = w.mchid;
-        return new Promise<IndexedObject>(resolve => {
-            request.post({
-                url: w.requestUrl(),
-                body: WxMiniApp.buildXML({xml: w.requestParams()}),
-                agentOptions: {
-                    pfx: wxp12,
-                    passphrase: mch_id
-                }
-            }, function(err, response, body){
-                WxMiniApp.parseXML(body, (err:IndexedObject, res:IndexedObject) => {
-                    if (err) {
-                        logger.fatal('转换支付到用户回调数据失败，{{=it.err}}', {err});
-                    }
-                    else {
-                        resolve(res);
-                    }
-                });
-            });
-        })
+    async ReqPaytoUser(w: WxappPaytoUser): Promise<IndexedObject> {
+        const config = {
+            appid: this.appid,
+            mchid: w.mchid,
+            partnerKey: this.pubkey,
+            pfx: fs.readFileSync(expand(Config.WX_P12)),
+            spbill_create_ip: '10.1.70.71'
+        };
+        const api = new tenpay(config);
+
+        let result = await api.transfers({
+            partner_trade_no: '111122221',
+            openid: 'oQq-J5ZcDiP_Fa9BIIG370MaOHGI',
+            amount: 110,
+            desc: '企业付款描述信息',
+            check_name: 'NO_CHECK'
+        });
+        console.log(result);
+        return result;
     }
 
     protected doSignaturePay(fields: Map<string, any>, key: string): string {
