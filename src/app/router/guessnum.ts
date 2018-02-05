@@ -91,13 +91,14 @@ export class Guessnum implements IRouter {
         setTimeout(async function () {
             console.log("红包要过期了");
             let pack = await Guessnum.getGuessPack(m.pid);
+            console.log(pack);
             pack.status=Code.PACK_EXPIRED;
             await Guessnum.updatePack(pack);
             let cost = new Delta();
             cost.addkv(configs.Item.MONEY, pack.remain);
             await User.ApplyDelta(ui, cost);
 
-        },configs.Parameter.Get("expire"));
+        },Number(configs.Parameter.Get("expire"))*60*60*1000);
 
         trans.submit();
     }
