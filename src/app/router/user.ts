@@ -301,13 +301,16 @@ export class User implements IRouter {
 
        let a=await  Call("sdk", 'sdk.withdraw', withdraw);
 
-       console.log(a);
-       m.data=a.model.data;
-       console.log("返回");
-       console.log(m);
-       let cost = new Delta();
-       cost.addkv(configs.Item.MONEY, m.money*100);
-       await User.ApplyDelta(ui, cost);
+       if(a.status != STATUS.FAILED){
+           console.log("返回");
+           console.log(m);
+           let cost = new Delta();
+           cost.addkv(configs.Item.MONEY, m.money*100*-1);
+           await User.ApplyDelta(ui, cost);
+       }else{
+           trans.status=Code.NO_MONEY;
+       }
+
        trans.submit();
    }
 
