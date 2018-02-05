@@ -376,7 +376,7 @@ export class Guessnum implements IRouter {
         }
 
         sendPackage.num=await Guessnum.getPackCountByUid(ui.uid);
-        sendPackage.record=await Guessnum.getPacksByUid(ui.uid,m.sendLimit,(m.sendPage-1)*m.sendLimit);
+        sendPackage.record=await Guessnum.getPacksByUid(ui.uid,m.sendLimit,(m.sendPage-1)*m.sendLimit,{"createTime":-1});
 
         let r =await Guessnum.getReceivePackageRecordsMoneyByUid(ui.uid);
         if(r == null){
@@ -386,7 +386,7 @@ export class Guessnum implements IRouter {
         }
 
         receivePackage.num=await Guessnum.getReceivePackageRecordsCountByUid(ui.uid);
-        receivePackage.record=await Guessnum.getReceivePackageRecordsByUid(ui.uid,m.receiveLimit,(m.receivePage-1)*m.receiveLimit);
+        receivePackage.record=await Guessnum.getReceivePackageRecordsByUid(ui.uid,m.receiveLimit,(m.receivePage-1)*m.receiveLimit,{"createTime":-1});
 
         m.sendPackages=sendPackage;
         m.receivePackages=receivePackage;
@@ -472,8 +472,8 @@ export class Guessnum implements IRouter {
         await Update(PackInfo,null,[{pid:pid},{$set:{status:status}}])
     }
 
-    protected static async getPacksByUid(uid:string,limit:number,skip:number){
-        return await QueryAll(PackInfo,{uid:uid},limit,skip);
+    protected static async getPacksByUid(uid:string,limit:number,skip:number,sort:any){
+        return await QueryAll(PackInfo,{uid:uid},limit,skip,sort);
     }
     protected static async getPackCountByUid(uid:string){
         return await Count(PackInfo,{uid:uid});
@@ -558,8 +558,8 @@ export class Guessnum implements IRouter {
         return await Count(PackGuessRecord,{uid:uid});
     }
 
-    protected static async getReceivePackageRecordsByUid(uid:string,limit:number,skip:number){
-        let ps= await QueryAll(PackGuessRecord,{uid:uid},limit,skip);
+    protected static async getReceivePackageRecordsByUid(uid:string,limit:number,skip:number,sort:any){
+        let ps= await QueryAll(PackGuessRecord,{uid:uid},limit,skip,sort);
         let getPacks:GetPack[]=[];
         for(let p of ps){
             let getPack:GetPack = new GetPack();
