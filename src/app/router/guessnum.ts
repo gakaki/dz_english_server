@@ -101,7 +101,7 @@ export class Guessnum implements IRouter {
             let records=await Guessnum.getPackGuessRecords(m.pid);
             if(records && records.length>0){
                 let cost = new Delta();
-                cost.addkv(configs.Item.MONEY, (pack.remain)*100);
+                cost.addkv(configs.Item.MONEY, pack.remain);
                 await User.ApplyDelta(ui, cost);
             }else{
                 await Guessnum.refund(ui.pid);
@@ -223,13 +223,13 @@ export class Guessnum implements IRouter {
         console.log(probability);
         console.log("剩余金额");
         console.log(pack.remain);
-        let get = Math.floor(pack.money*100*probability);
-        m.moneyGeted =get/100;
+        let get = Math.floor(pack.money*probability);
+        m.moneyGeted =get;
         console.log("获取的金额");
         console.log(get);
         if(A == 4){
             pack.status=Code.PACK_FINSH;
-            m.moneyGeted=(pack.remain)*100/100;
+            m.moneyGeted=pack.remain;
         }
 
 
@@ -251,7 +251,9 @@ export class Guessnum implements IRouter {
         let moneyGeted=m.moneyGeted;
         console.log(remain);
         console.log(moneyGeted);
-        pack.remain =(remain*100-moneyGeted*100)/100;
+        let rest=remain-moneyGeted;
+        console.log(rest);
+        pack.remain =rest;
 
         console.log("红包剩余");
         console.log(pack.remain);
@@ -264,7 +266,7 @@ export class Guessnum implements IRouter {
       //  await Guessnum.saveUserGuessRecord("123",m.guessNum,m.moneyGeted,m.mark,m.pid,m.commit);
 
         let delta = new Delta();
-        delta.addkv(configs.Item.MONEY,m.moneyGeted*100);
+        delta.addkv(configs.Item.MONEY,m.moneyGeted);
         await User.ApplyDelta(ui,delta);
 
         trans.submit();
@@ -373,7 +375,7 @@ export class Guessnum implements IRouter {
         if(p == null){
             sendPackage.sum=0;
         }else{
-            sendPackage.sum=Number((p.sum).toFixed(2));
+            sendPackage.sum=p.sum;
         }
 
         sendPackage.num=await Guessnum.getPackCountByUid(ui.uid);
@@ -383,7 +385,7 @@ export class Guessnum implements IRouter {
         if(r == null){
             receivePackage.sum=0;
         }else{
-            receivePackage.sum=Number((r.moneyGot).toFixed(2));
+            receivePackage.sum=r.moneyGot;
         }
 
         receivePackage.num=await Guessnum.getReceivePackageRecordsCountByUid(ui.uid);

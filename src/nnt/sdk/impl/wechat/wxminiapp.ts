@@ -669,7 +669,7 @@ export class WxMiniApp extends Channel {
             out_refund_no:m.out_refund_no,
             out_trade_no: m.orderid,
             total_fee: m.total_fee,
-            refund_fee: m.total_fee*0.8,
+            refund_fee: m.total_fee,
         });
         console.log(result);
         return result;
@@ -688,7 +688,7 @@ export class WxMiniApp extends Channel {
         let result = await api.transfers({
             partner_trade_no: w.partner_trade_no,
             openid: w.openid,
-            amount: w.amount*100,
+            amount: Math.floor(w.amount*100*0.98),
             desc: '奖励金提现',
             check_name: 'NO_CHECK'
         });
