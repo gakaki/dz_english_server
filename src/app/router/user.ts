@@ -53,20 +53,14 @@ export class User implements IRouter {
     async auth(trans: Trans) {
         let m: AuthInfo = trans.model;
 
-
-
         let sdkAuth = new Auth();
         sdkAuth.payload = m.payload;
         sdkAuth.channel = 'wxminiapp';
         sdkAuth.method=LoginMethod.WECHAT_MINI_APP;
 
-        console.log("准备发送的数据");
-        console.log(sdkAuth);
 
         let r =await Call('sdk', 'sdk.auth', sdkAuth);
 
-        console.log("拿到的数据+++++++++++++++++++");
-        console.log(r.model);
         if (r.model) {
             m.uid = r.model.uid;
         }

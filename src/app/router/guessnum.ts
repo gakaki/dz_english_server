@@ -29,8 +29,6 @@ export class Guessnum implements IRouter {
     async sendpack(trans: Trans){
         let m: PackInfo = trans.model;
 
-        console.log("请求来了");
-        console.log(m.money);
         let ui:UserInfo=await User.FindUserBySid(trans.sid);
 
         if(ui==null){
@@ -56,11 +54,12 @@ export class Guessnum implements IRouter {
             }
            // m.money -= 100;//代金券抵1元
             //扣代金券
-            cost.addkv(configs.Item.CASHCOUPON, 1);
+            cost.addkv(configs.Item.CASHCOUPON, -1);
         }
         //扣钱数
-        cost.addkv(configs.Item.MONEY, m.money*100);
+        cost.addkv(configs.Item.MONEY, m.money*100*-1);
         //获得加速卡
+
         cost.addkv(configs.Item.ACCELERATION,2);
 
 
@@ -82,10 +81,13 @@ export class Guessnum implements IRouter {
         //生成红包
 
         //应用扣除
-        await User.ApplyDelta(ui, cost.asCost());
+        await User.ApplyDelta(ui, cost);
+        let money=ui.itemCount(1);
+
         //存库
         m.pid = DateTime.Current();
         m.uid=ui.uid;
+      //  m.uid="123";
         m.password = Guessnum.getCode();
         m.remain = m.money;
         m.status = Code.PACK_Fighing;
@@ -93,6 +95,7 @@ export class Guessnum implements IRouter {
 
         await Insert(PackInfo, m);
         m.userInfo=ui;
+
 
         setTimeout(async function () {
             console.log("红包要过期了");
@@ -104,7 +107,7 @@ export class Guessnum implements IRouter {
             cost.addkv(configs.Item.MONEY, pack.remain);
             await User.ApplyDelta(ui, cost);
 
-        },Number(configs.Parameter.Get("expire"))*60*60*1000);
+        },Number(configs.Parameter.Get("expire").value)*60*60*1000);
 
         trans.submit();
     }
@@ -124,10 +127,9 @@ export class Guessnum implements IRouter {
             trans.submit();
             return
         }
-        console.log(pack);
+
         let time= new Date(pack.createTime);
-        console.log("创建时间");
-        console.log(time);
+
         if(time.getTime() +Number(configs.Parameter.Get("expire").value)*60*60*1000 <= new Date().getTime()){
             console.log(new Date().getTime());
             trans.status = Code.PACK_EXPIRED;
@@ -149,7 +151,6 @@ export class Guessnum implements IRouter {
         }
 
         if(pack.CDList){
-            console.log("存在cd列表");
             if(pack.CDList[trans.sid]){
                 console.log(pack.CDList[trans.sid]);
                 console.log(pack.CDList[trans.sid]+Number(configs.Parameter.Get("waitcd").value)*1000);
@@ -160,12 +161,10 @@ export class Guessnum implements IRouter {
                     trans.submit();
                     return
                 }else{
-                    console.log("删除");
                     delete pack.CDList[trans.sid];
                 }
             }
         }else{
-            console.log("不存在CD列表");
             pack.CDList={};
         }
 
@@ -254,13 +253,12 @@ export class Guessnum implements IRouter {
         let remain =pack.remain;
         let moneyGeted=m.moneyGeted;
 
-       pack.remain =(remain*100-moneyGeted*100)/100
+       pack.remain =(remain*100-moneyGeted*100)/100;
 
         pack.CDList[trans.sid] = new Date().getTime();
         pack.guessCount -= 1;
         await Guessnum.updatePack(pack);
-        console.log("结束");
-        console.log(pack.CDList);
+
         await Guessnum.saveUserGuessRecord(ui.uid,m.guessNum,m.moneyGeted,m.mark,m.pid,m.commit);
       //  await Guessnum.saveUserGuessRecord("123",m.guessNum,m.moneyGeted,m.mark,m.pid,m.commit);
 
@@ -273,7 +271,6 @@ export class Guessnum implements IRouter {
     //清除等待CD
     @action(ClearCD)
     async clearcd(trans:Trans){
-        console.log("没有进来？");
         let m:ClearCD = trans.model;
         let ui:UserInfo=await User.FindUserBySid(trans.sid);
         if(ui==null){
@@ -303,9 +300,6 @@ export class Guessnum implements IRouter {
         await User.ApplyDelta(ui,delta);
 
         if(pack.CDList[trans.sid]){
-            console.log(pack.CDList[trans.sid]);
-            console.log(pack.CDList[trans.sid]+Number(configs.Parameter.Get("waitcd").value)*1000);
-            console.log(new Date().getTime());
             if(pack.CDList[trans.sid]+Number(configs.Parameter.Get("waitcd").value)*1000 >= new Date().getTime()){
                 delete pack.CDList[trans.sid];
                 await Guessnum.updatePack(pack);
@@ -337,8 +331,6 @@ export class Guessnum implements IRouter {
         m.packPassword=pack.password;
         m.packInfo=pack;
         let records=await Guessnum.getPackGuessRecords(m.pid);
-        console.log("查询的记录");
-        console.log(records);
         m.records=records;
         console.log(m);
         trans.submit();
@@ -359,10 +351,8 @@ export class Guessnum implements IRouter {
         m.packInfo=pack;
         m.answer=pack.password;
         let result=await Guessnum.getPackRankingList(m.pid);
-        //console.log(result);
-
         m.rank=result;
-       // console.log(m);
+
         trans.submit()
     }
     //用户红包记录
@@ -479,7 +469,7 @@ export class Guessnum implements IRouter {
             $group:{_id:"$uid",sum:{$sum:"$money"}},
             $limit:1,
         });
-        console.log(r);
+
         if(r &&r.length>0){
             return  r[0]
         }else{
@@ -514,11 +504,10 @@ export class Guessnum implements IRouter {
             $group:{_id:"$uid",moneyGot:{$sum:"$userGetMoney"}},
             $sort:{moneyGot: -1},
         });
-        console.log(r);
+
         let rankInfos :RankInfo[] = [];
         for(let record of r){
             let rankInfo:RankInfo = new RankInfo();
-            console.log(record._id);
             rankInfo.uid=record._id;
             rankInfo.userInfo=await User.FindUserInfoByUid(record._id);
             rankInfo.moneyGot=record.moneyGot;
@@ -539,7 +528,6 @@ export class Guessnum implements IRouter {
         });
 
         return recordsSort[0];
-        //return "1"
     }
 
     protected static getMarkId(mark:string){
@@ -576,8 +564,6 @@ export class Guessnum implements IRouter {
             $group:{_id:"$uid",moneyGot:{$sum:"$userGetMoney"}},
             $limit:1,
         });
-        console.log("获取的总金额");
-        console.log(r);
         if(r && r.length>0){
             return r[0];
         }else{

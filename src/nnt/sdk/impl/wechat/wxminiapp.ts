@@ -91,17 +91,8 @@ export class WxMiniApp extends Channel {
         m.appid = appid;
         m.appsecret = appsecret;
 
-        console.log("准备授权");
-        console.log(authcode);
-        console.log(appid);
-        console.log(appsecret);
-        console.log(m);
-
         m = await RestSession.Get(m);
 
-        console.log("微信返回结果");
-
-        console.log(m);
         if (!m) {
             logger.log("微信小程序：用户授权通过，获取 token 失败");
             return null;
@@ -176,10 +167,7 @@ export class WxMiniApp extends Channel {
         //下次登录直接用sid登录，sid会自动续期
 
         logger.info("我要进行微信授权登陆");
-        console.log(m);
 
-        console.log(m.payload);
-        console.log(m.payload.code);
 
         if (m.payload && m.payload.code) {
             let authcode = m.payload.code;
@@ -189,8 +177,7 @@ export class WxMiniApp extends Channel {
 
             // 请求token
             let lg = await this.doReqToken(authcode, appid, appsec, authtype);
-            console.log("获取的token");
-            console.log(lg);
+
             if (lg) {
                 // 请求个人信息
                 // let pf = await this.doReqProfile(lg.session_key, lg.openid);
@@ -469,9 +456,9 @@ export class WxMiniApp extends Channel {
         wuo.out_trade_no = m.orderid;
         wuo.total_fee = m.price; // 正式的价格
         wuo.time_start=moment(new Date()).format("YYYYMMDDHHMMSS");
-        console.log("用户端ip");
-        console.log(trans.info.addr);
-       // wuo.spbill_create_ip = trans.info.addr;
+        console.log("价格");
+        console.log(m.price);
+        // wuo.spbill_create_ip = trans.info.addr;
         wuo.spbill_create_ip = m.IP;
         if(!m.IP){
             wuo.spbill_create_ip = trans.info.addr;
@@ -516,8 +503,7 @@ export class WxMiniApp extends Channel {
         wuo.created = DateTime.Now();
 
         let res = await RestSession.Get(wuo);
-        console.log("我发送请求了==============================");
-        console.log(res);
+
         if (!res) {
             wuo.success = false;
             Insert(make_tuple(this._sdk.dbsrv, WechatUnifiedOrder), Output(wuo));

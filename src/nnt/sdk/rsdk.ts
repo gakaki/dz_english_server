@@ -70,8 +70,7 @@ export class RSdk implements IRouter {
     @action(Auth, [], "第三方授权")
     async auth(trans: Transaction) {
         let m: Auth = trans.model;
-        //trans.timeout(20);
-        console.log("第三方授权");
+        trans.timeout(20);
 
         let chann = this._sdk.channel(m.channel);
 
@@ -85,7 +84,7 @@ export class RSdk implements IRouter {
         let authA= await chann.doAuth(m);
 
         logger.info("返回的授权信息");
-        console.log(authA);
+
 
         if(! authA.uid){
             trans.status = STATUS.THIRD_FAILED;
