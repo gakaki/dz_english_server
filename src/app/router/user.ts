@@ -228,7 +228,7 @@ export class User implements IRouter {
        }
        let srv = static_cast<Api>(trans.server);
        let payInfo:RechargeRecord = new RechargeRecord();
-       payInfo.price = m.payCount;
+       payInfo.price = m.payCount*100;
        payInfo.time = DateTime.Current();
        payInfo.pid=ui.uid;
       // payInfo.pid = "123";
@@ -265,7 +265,6 @@ export class User implements IRouter {
            return
        }
        m.payload=a.model.payload;
-       console.log(a);
        trans.submit();
    }
 
