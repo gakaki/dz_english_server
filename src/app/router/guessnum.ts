@@ -31,6 +31,7 @@ export class Guessnum implements IRouter {
     async sendpack(trans: Trans){
         let m: PackInfo = trans.model;
         console.log("发送红包");
+        console.log(m.money);
         let ui:UserInfo=await User.FindUserBySid(trans.sid);
 
         if(ui==null){
@@ -44,6 +45,7 @@ export class Guessnum implements IRouter {
             trans.submit();
             return;
         }
+
 
 
         //计算扣除
@@ -67,6 +69,8 @@ export class Guessnum implements IRouter {
 
 
         let need = Delta.NeedItems(cost.items, ui.items);
+
+        console.log(need);
         //钱数不足，客户端根据错误码跳支付
         if (need.size) {
             trans.status = Code.NEED_MONEY;
@@ -222,14 +226,15 @@ export class Guessnum implements IRouter {
        }
         console.log("概率");
         console.log(probability);
-
+        console.log("剩余金额");
+        console.log(pack.remain);
         let get = Math.floor(pack.money*100*probability);
         m.moneyGeted =get/100;
         console.log("获取的金额");
         console.log(get);
-        if(A==4){
+        if(A == 4){
             pack.status=Code.PACK_FINSH;
-            m.moneyGeted=pack.remain;
+            m.moneyGeted=(pack.remain)*100/100;
         }
 
 
@@ -255,6 +260,7 @@ export class Guessnum implements IRouter {
 
         console.log("红包剩余");
         console.log(pack.remain);
+
         pack.CDList[trans.sid] = new Date().getTime();
         pack.guessCount -= 1;
         await Guessnum.updatePack(pack);
@@ -522,6 +528,7 @@ export class Guessnum implements IRouter {
 
         let rankInfos :RankInfo[] = [];
         for(let record of r){
+            console.log(record.moneyGot);
             let rankInfo:RankInfo = new RankInfo();
             rankInfo.uid=record._id;
             rankInfo.userInfo=await User.FindUserInfoByUid(record._id);
