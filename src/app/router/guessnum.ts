@@ -148,7 +148,8 @@ export class Guessnum implements IRouter {
         }
 
         if(pack.guessCount<=0){
-            trans.status = Code.PACK_FINSH;
+            trans.status = Code.COUNT_OVER;
+            Guessnum.updatePackStatus(pack.pid,Code.COUNT_OVER);
             trans.submit();
             return
         }

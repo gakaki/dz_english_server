@@ -31,7 +31,7 @@ export class Code {
     static PHONE_BINDED = -126; // 手机已经绑定过其他账号
     static MUST_FRIEND = -127; // 必须是好友
     static PACKID_MQ_CREATE_FAILED = -128; // 红包消息通道失败
-   // static COUNT_OVER = -129; //竞猜次数用尽
+    static COUNT_OVER = -129; //竞猜次数用尽
     static PACK_EMPTY = -130; //红包不存在
     static PACK_EXPIRED = -131; //红包已过期
     static PACK_FINSH = -132; //红包竞猜结束
