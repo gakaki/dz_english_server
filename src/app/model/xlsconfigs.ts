@@ -181,7 +181,7 @@ interface pair <K, V> {k:K;v:V;}
         ];
 
     export const parameters:Array<any> = [
-        ["timeslimit","20"],["waitcd","180"],["expire","24"],["rewardmax","50000"],["withdrawalsmax","50000"],["withdrawalsnum","3"],["withdrawalsmin","2"]
+        ["timeslimit","20"],["waitcd","180"],["expire","0.1"],["rewardmax","50000"],["withdrawalsmax","50000"],["withdrawalsnum","3"],["withdrawalsmin","2"]
         ];
 
     export const messages:Array<any> = [
