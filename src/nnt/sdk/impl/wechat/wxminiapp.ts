@@ -558,6 +558,7 @@ export class WxMiniApp extends Channel {
             };
             fields = ObjectT.ToMap(m.payload);
             m.payload.paySign = this.doSignaturePay(fields, wuo.signkey);
+            m.payload.orderId = wuo.out_trade_no = m.orderid;
         }
         else if (m.method == PayMethod.WECHAT_QRCODE) {
             // 二维码需要包含的链接

@@ -16,6 +16,10 @@ export class PackInfo {
     @colinteger()
     pid: number;
 
+    @string(20,[input,optional],"订单号")
+    @colstring()
+    orderId:string;
+
     @double(2, [input,output], "钱数")
     @coldouble()
     money: number;

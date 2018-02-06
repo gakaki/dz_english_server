@@ -107,6 +107,8 @@ export class Shop implements IRouter {
 
         let ui = await User.FindUserInfo(rcd.pid);
         let delta = Delta.Item(Item.FromIndex(configs.Item.MONEY)).record(ItemRecordType.BUY);
+
+
      //   console.log("用户当前金额");
     //    let i=await ui.itemCount(1);
     //    console.log(i);

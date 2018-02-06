@@ -87,10 +87,10 @@ export class Guessnum implements IRouter {
         let money=m.money;
         m.money=Math.floor(money*100);
         m.remain = Math.floor(money*100);
-        console.log(m);
+
         m.status = Code.PACK_Fighing;
 
-
+        console.log(m);
         await Insert(PackInfo, m);
         m.userInfo=ui;
 
@@ -107,7 +107,10 @@ export class Guessnum implements IRouter {
                 cost.addkv(configs.Item.MONEY, pack.remain);
                 await User.ApplyDelta(ui, cost);
             }else{
-                await Guessnum.refund(ui.pid);
+                if(pack.orderId){
+                    await Guessnum.refund(ui.pid,pack.orderId);
+                }
+
             }
 
 
@@ -597,8 +600,8 @@ export class Guessnum implements IRouter {
 
     }
 
-    protected static async refund(pid:string){
-        let rechargeRecord =await Query(RechargeRecord,{"pid":pid});
+    protected static async refund(pid:string,orderId:string){
+        let rechargeRecord =await Query(RechargeRecord,{"orderid":orderId});
         if(rechargeRecord == null){
             return false;
         }
