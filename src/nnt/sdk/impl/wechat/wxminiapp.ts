@@ -618,6 +618,8 @@ export class WxMiniApp extends Channel {
         wtd.sign = this.doSignaturePay(fields, wtd.signkey);
         wtd.created = new Date().toLocaleDateString();
 
+        console.log("数据库");
+        console.log(this._sdk.dbsrv);
 
         let res = await this.ReqPaytoUser(wtd);
         console.log(res);

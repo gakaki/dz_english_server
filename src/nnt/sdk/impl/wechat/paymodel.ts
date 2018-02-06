@@ -278,7 +278,7 @@ export class WechatPayResult {
 
 
 @model()
-@table('', 'wx_pay_to_user')
+@table('kv', 'wx_pay_to_user')
 export class WxappPaytoUser extends WechatPayModel{
     constructor() {
         super();
