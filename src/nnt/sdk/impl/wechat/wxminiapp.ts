@@ -643,7 +643,7 @@ export class WxMiniApp extends Channel {
 
         // 保存纪录
 
-        await Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(res));
+        await Insert(make_tuple(this._sdk.dbsrv, WxappPaytoUser), Output(wtd));
         return true;
     }
     async ReqUserRefund(m:WechatRefundRecord):Promise<IndexedObject>{
