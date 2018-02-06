@@ -196,7 +196,7 @@ export class User implements IRouter {
         trans.submit();
     }
     @action(ChangeItem)
-   async chaneitem(trans:Trans){
+   async changeitem(trans:Trans){
         let m:ChangeItem = trans.model;
         let cost = new Delta();
 
@@ -304,7 +304,6 @@ export class User implements IRouter {
 
        if(a.status != STATUS.FAILED){
            console.log("返回");
-           console.log(m);
            let cost = new Delta();
            cost.addkv(configs.Item.MONEY, m.money*100*-1);
            await User.ApplyDelta(ui, cost);
@@ -421,6 +420,7 @@ export class User implements IRouter {
     @action(ItemQuery)
     async getiteminfo(trans:Trans){
         let m:ItemQuery = trans.model;
+        console.log("查询道具");
         let ui:UserInfo=await User.FindUserBySid(trans.sid);
         if(ui==null){
             trans.status = Code.USER_NOT_FOUND;
@@ -428,6 +428,8 @@ export class User implements IRouter {
             return
         }
         m.stock=ui.itemCount(m.itemId);
+
+        console.log(m.stock);
         trans.submit();
     }
 

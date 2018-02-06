@@ -459,4 +459,5 @@ export class Withdraw {
     @json(9, [output], "客户端发起支付需要的数据")
     @coljson()
     payload: IndexedObject;
+
 }
