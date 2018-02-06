@@ -325,8 +325,9 @@ export class WxappPaytoUser extends WechatPayModel{
     @colstring()
     openid: string;
 
-    @colinteger()
-    created: number; // 订单创建时间
+    @colstring()
+    created: string; // 订单创建时间
+
 
     @colboolean()
     success: boolean; // 订单下单成功还是失败

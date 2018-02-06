@@ -616,7 +616,7 @@ export class WxMiniApp extends Channel {
         // 计算签名
         let fields = ObjectT.ToMap(Encode(wtd));
         wtd.sign = this.doSignaturePay(fields, wtd.signkey);
-        wtd.created = DateTime.Now();
+        wtd.created = new Date().toLocaleDateString();
 
 
         let res = await this.ReqPaytoUser(wtd);

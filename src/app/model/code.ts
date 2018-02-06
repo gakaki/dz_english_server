@@ -38,6 +38,7 @@ export class Code {
     static PACK_ISCD = -133; //红包竞猜CD中
     static PACK_ISSHARED=-134;//不是首次分享
     static NO_MONEY=-136;//企业没钱
+    static EXCEED_COUNT=-137;//超过提现次数
     static PACK_Fighing = 168; //红包可竞猜
     static NEED_COUPON = 170; //代金券不足
     static NEED_MONEY = 171; //金额不足

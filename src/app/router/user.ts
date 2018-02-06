@@ -9,7 +9,7 @@ import {
     UserActionRecord, UserActionRecordType, UserInfo, UserPicture, UserPictures, UserShare, UserShareCounter,
     UserShareDailyCounter, UserSid, UserTili, UserType, UserVipGiftCounter
 } from "../model/user";
-import {AutoInc, Delete, Get, Insert, Iterate, Query, QueryAll, Set, Update} from "../../nnt/manager/dbmss";
+import {AutoInc, Count, Delete, Get, Insert, Iterate, Query, QueryAll, Set, Update} from "../../nnt/manager/dbmss";
 import {GetInnerId, Output} from "../../nnt/store/proto";
 import {DateTime} from "../../nnt/core/time";
 import {Trans} from "../server/trans";
@@ -31,6 +31,7 @@ import {REGEX_PHONE} from "../../nnt/component/pattern";
 import {configs} from "../model/xlsconfigs";
 import {Api} from "../server/api";
 import {RechargeRecord} from "../model/shop";
+import {WxappPaytoUser} from "../../nnt/sdk/impl/wechat/paymodel";
 
 
 export class User implements IRouter {
@@ -294,6 +295,13 @@ export class User implements IRouter {
            trans.submit();
            return;
        }
+       let count=await Count(WxappPaytoUser,{"openid":ui.uid,"created":new Date().toLocaleDateString()});
+       if(count>Number(configs.Parameter.Get("withdrawalsnum").value)){
+           trans.status=Code.EXCEED_COUNT;
+           trans.submit();
+           return;
+       }
+
        let withdraw:Withdraw = new Withdraw();
        withdraw.money = m.money;
        withdraw.channel="wxminiapp";
