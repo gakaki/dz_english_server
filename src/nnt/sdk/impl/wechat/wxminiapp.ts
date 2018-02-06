@@ -459,12 +459,15 @@ export class WxMiniApp extends Channel {
         record.createTime=DateTime.Current();
 
         let res = await this.ReqUserRefund(record);
+
+
         if(!res){
             record.success=false;
-            return false
+        }else{
+            record.success=true;
+            record.status=res.return_code;
         }
-        record.success=true;
-        record.status=res.return_code;
+
         logger.info("退款人："+m.pid+"退款金额："+m.total_fee+"退款状态："+res.return_code);
         await Insert(make_tuple(this._sdk.dbsrv, WechatRefundRecord), Output(record));
         return true;
@@ -588,7 +591,7 @@ export class WxMiniApp extends Channel {
         return true;
     }
 
-    genWithdrawTradeNO(uid:string): string {
+    genWithdrawTradeNO(): string {
         return `withdraw${DateTime.Current()}`;
     }
 
@@ -598,16 +601,16 @@ export class WxMiniApp extends Channel {
         wtd.nonce_str = NonceAlDig(10);
 
         //sign
-        wtd.partner_trade_no = this.genWithdrawTradeNO(m.uid);
-        wtd.amount = m.money*100; // 正式的价格
+        wtd.partner_trade_no = this.genWithdrawTradeNO();
+        wtd.amount = m.money; // 正式的价格
         wtd.spbill_create_ip = getServerIp()||"192.168.0.1";
-        //wtd.spbill_create_ip = "192.168.0.1";
+       // wtd.spbill_create_ip = "192.168.0.1";
         wtd.mch_appid = this.appid;
         wtd.mchid = this.pubmchid;
         wtd.signkey = this.pubkey;
         wtd.check_name="NO_CHECK";
         wtd.openid = m.uid;
-       // wtd.openid = "oQq-J5XuO2NawkxByfpkMrOAPmLg";
+        //wtd.openid = "oQq-J5XuO2NawkxByfpkMrOAPmLg";
 
 
         // 计算签名
@@ -683,7 +686,7 @@ export class WxMiniApp extends Channel {
                 desc: '奖励金提现',
                 check_name: 'NO_CHECK'
             });
-
+            console.log(result);
             return true;
         }catch (err){
             logger.warn("提现失败"+err);

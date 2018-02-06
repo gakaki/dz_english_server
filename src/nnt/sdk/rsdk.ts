@@ -393,7 +393,7 @@ export class RSdk implements IRouter {
             return;
         }
 
-        let ok = await chann.doWithdraw(m, rcd);
+        let ok = await chann.doWithdraw(m);
         console.log("中间返回");
         console.log(ok);
         if (!ok) {

@@ -1,6 +1,7 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
 import {
-    AuthInfo, ChaneItem, ItemQuery, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppPay, MinAppShare,
+    AuthInfo, ChangeItem, ItemQuery, ItemRecord, ItemRecordType, LoginInfo, Mail, Mails, MinAppPay,
+    MinAppShare,
     MinAppWithdraw,
     PictureInfo,
     QueryUser,
@@ -194,9 +195,9 @@ export class User implements IRouter {
 
         trans.submit();
     }
-    @action(ChaneItem)
+    @action(ChangeItem)
    async chaneitem(trans:Trans){
-        let m:ChaneItem = trans.model;
+        let m:ChangeItem = trans.model;
         let cost = new Delta();
 
         cost.addkv(m.itemId,m.num);
@@ -297,7 +298,7 @@ export class User implements IRouter {
        withdraw.money = m.money;
        withdraw.channel="wxminiapp";
        withdraw.uid=ui.uid;
-      // withdraw.uid="123";
+    //   withdraw.uid="123";
 
        let a=await  Call("sdk", 'sdk.withdraw', withdraw);
 

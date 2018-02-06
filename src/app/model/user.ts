@@ -389,7 +389,7 @@ export class ItemQuery{
     stock:number;
 }
 
-export class ChaneItem{
+export class ChangeItem{
     @integer(1,[input])
     itemId:number;
 
@@ -397,7 +397,7 @@ export class ChaneItem{
     num:number;
 
     @string(3,[input])
-    uid:string
+    uid:string;
 
     @type(4,UserInfo,[output])
     userInfo:UserInfo;
