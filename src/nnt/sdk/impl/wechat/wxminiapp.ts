@@ -461,14 +461,14 @@ export class WxMiniApp extends Channel {
         let res = await this.ReqUserRefund(record);
 
 
-        if(!res){
+        if(res == null){
             record.success=false;
         }else{
             record.success=true;
             record.status=res.return_code;
+            logger.info("退款人："+m.pid+"退款金额："+m.total_fee+"退款状态："+res.return_code);
         }
 
-        logger.info("退款人："+m.pid+"退款金额："+m.total_fee+"退款状态："+res.return_code);
         await Insert(make_tuple(this._sdk.dbsrv, WechatRefundRecord), Output(record));
         return true;
     }
@@ -658,17 +658,21 @@ export class WxMiniApp extends Channel {
             spbill_create_ip:getServerIp()|| '10.1.70.71'
         };
         const api = new tenpay(config);
+        try{
+            let result = await api.refund({
+                op_user_id:this.pubid,
+                out_refund_no:m.out_refund_no,
+                out_trade_no: m.orderid,
+                total_fee: m.total_fee,
+                refund_fee: m.total_fee,
+            });
+            console.log(result);
+            return result;
+        }catch (err){
+            logger.warn("退款失败:"+err);
+            return null;
+        }
 
-
-        let result = await api.refund({
-            op_user_id:this.pubid,
-            out_refund_no:m.out_refund_no,
-            out_trade_no: m.orderid,
-            total_fee: m.total_fee,
-            refund_fee: m.total_fee,
-        });
-        console.log(result);
-        return result;
     }
 
     async ReqPaytoUser(w: WxappPaytoUser): Promise<boolean> {

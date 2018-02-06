@@ -103,10 +103,12 @@ export class Guessnum implements IRouter {
             await Guessnum.updatePack(pack);
             let records=await Guessnum.getPackGuessRecords(m.pid);
             if(records && records.length>0){
+                console.log("有竞猜记录");
                 let cost = new Delta();
                 cost.addkv(configs.Item.MONEY, pack.remain);
                 await User.ApplyDelta(ui, cost);
             }else{
+                console.log("没有竞猜记录");
                 if(pack.orderId){
                     await Guessnum.refund(ui.pid,pack.orderId);
                 }
