@@ -101,6 +101,10 @@ export class Guessnum implements IRouter {
             console.log(pack);
             pack.status=Code.PACK_EXPIRED;
             await Guessnum.updatePack(pack);
+            if(pack.useTicket){
+                return;
+            }
+            console.log("没有使用赏金券");
             let records=await Guessnum.getPackGuessRecords(m.pid);
             if(records && records.length>0){
                 console.log("有竞猜记录");
@@ -116,7 +120,7 @@ export class Guessnum implements IRouter {
             }
 
 
-        },Number(configs.Parameter.Get("expire").value)*60*60*1000);
+        },Number(configs.Parameter.Get("expire").value)*60*1000);
 
         trans.submit();
     }
