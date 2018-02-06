@@ -85,8 +85,8 @@ export class Guessnum implements IRouter {
       //  m.uid="123";
         m.password = Guessnum.getCode();
         let money=m.money;
-        m.money=money*100;
-        m.remain = money*100;
+        m.money=Math.floor(money*100);
+        m.remain = Math.floor(money*100);
         console.log(m);
         m.status = Code.PACK_Fighing;
 
@@ -295,8 +295,9 @@ export class Guessnum implements IRouter {
             trans.submit();
             return
         }
-
-        if(ui.itemCount(configs.Item.ACCELERATION)<0){
+        console.log("加速卡还剩");
+        console.log(ui.itemCount(configs.Item.ACCELERATION));
+        if(ui.itemCount(configs.Item.ACCELERATION) <= 0){
             trans.status=Code.NEED_ITEMS;
             trans.submit();
             return;
