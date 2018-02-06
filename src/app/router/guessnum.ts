@@ -120,7 +120,7 @@ export class Guessnum implements IRouter {
             }
 
 
-        },Number(configs.Parameter.Get("expire").value)*60*1000);
+        },Number(configs.Parameter.Get("expire").value)*60*60*1000);
 
         trans.submit();
     }
