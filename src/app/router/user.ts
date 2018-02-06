@@ -295,7 +295,12 @@ export class User implements IRouter {
            trans.submit();
            return;
        }
-       let count=await Count(make_tuple("sdk", WxappPaytoUser),{"openid":ui.uid,"created":new Date().toLocaleDateString()});
+       if(m.money<Number(configs.Parameter.Get("withdrawalsmin").value)){
+           trans.status=Code.LESS_MONEY;
+           trans.submit();
+           return;
+       }
+       let count=await Count(make_tuple("kv", WxappPaytoUser),{"openid":ui.uid,"created":new Date().toLocaleDateString()});
        if(count>Number(configs.Parameter.Get("withdrawalsnum").value)){
            trans.status=Code.EXCEED_COUNT;
            trans.submit();
