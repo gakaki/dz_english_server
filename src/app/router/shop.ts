@@ -119,8 +119,8 @@ export class Shop implements IRouter {
         pack.title=rcd.title;
         pack.password = Guessnum.getCode();
         let money=rcd.price;
-        pack.money=Math.floor(money*100);
-        pack.remain = Math.floor(money*100);
+        pack.money=Math.floor(money);
+        pack.remain = Math.floor(money);
 
         pack.status = Code.PACK_Fighing;
 
