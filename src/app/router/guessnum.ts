@@ -51,6 +51,10 @@ export class Guessnum implements IRouter {
                 m=pack;
                 trans.submit();
                 return;
+            }else{
+                trans.status=Code.PACK_EMPTY;
+                trans.submit();
+                return;
             }
         }
 
