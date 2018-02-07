@@ -429,6 +429,7 @@ export class Guessnum implements IRouter {
            m.getItem=true;
            m.itemId=configs.Item.ACCELERATION;
        }else{
+           trans.status=Code.PACK_ISSHARED;
            m.num=0;
            m.getItem=false;
            m.itemId=configs.Item.ACCELERATION;
