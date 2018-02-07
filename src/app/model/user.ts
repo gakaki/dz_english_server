@@ -409,6 +409,9 @@ export class MinAppPay{
     @double(1,[input,output],"交易金额")
     payCount:number;
 
+    @string(4,[input],"红包标题")
+    title:string;
+
     @json(2, [output], "客户端发起支付需要的数据")
     @coljson()
     payload: IndexedObject;

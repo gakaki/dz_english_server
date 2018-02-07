@@ -11,6 +11,9 @@ export class RechargeRecord extends PayOrder {
     @colstring()
     pid: string;
 
+    @colstring()
+    title:string;
+
 }
 
 

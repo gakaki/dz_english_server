@@ -45,26 +45,30 @@ export class Guessnum implements IRouter {
             trans.submit();
             return
         }
+        if(m.orderId){
+            let pack=await Query(PackInfo,{"orderId":m.orderId});
+            if(pack !=null){
+                m=pack;
+                trans.submit();
+                return;
+            }
+        }
 
 
         //计算扣除
         let cost = new Delta();
-        if (m.useTicket) {
-            if(ui.itemCount(configs.Item.CASHCOUPON)<0){
-                trans.status=Code.NEED_COUPON;
-                trans.submit();
-                return;
-            }
+
+        if(ui.itemCount(configs.Item.CASHCOUPON)<0){
+            trans.status=Code.NEED_COUPON;
+            trans.submit();
+            return;
+        }
            // m.money -= 100;//代金券抵1元
             //扣代金券
-            cost.addkv(configs.Item.CASHCOUPON, -1);
-        }/*else{
-            //扣钱数
-            cost.addkv(configs.Item.MONEY, m.money*100*-1);
-        }*/
+        cost.addkv(configs.Item.CASHCOUPON, -1);
+
 
         //获得加速卡
-
         cost.addkv(configs.Item.ACCELERATION,2);
 
 
@@ -104,22 +108,6 @@ export class Guessnum implements IRouter {
             if(pack.useTicket){
                 return;
             }
-            console.log("没有使用赏金券");
-            let records=await Guessnum.getPackGuessRecords(m.pid);
-            if(records && records.length>0){
-                console.log("有竞猜记录");
-                let cost = new Delta();
-                cost.addkv(configs.Item.MONEY, pack.remain);
-                await User.ApplyDelta(ui, cost);
-            }else{
-                console.log("没有竞猜记录");
-                if(pack.orderId){
-                    await Guessnum.refund(ui.pid,pack.orderId);
-                }
-
-            }
-
-
         },Number(configs.Parameter.Get("expire").value)*60*60*1000);
 
         trans.submit();
@@ -446,7 +434,7 @@ export class Guessnum implements IRouter {
        trans.submit();
    }
 
-    protected static getCode(){
+    public static getCode(){
         let psw=new Set();
         while (psw.size < 4) {
             psw.add(Random.Rangei(0, 9, true))
@@ -606,7 +594,7 @@ export class Guessnum implements IRouter {
 
     }
 
-    protected static async refund(pid:string,orderId:string){
+    public static async refund(pid:string,orderId:string){
         let rechargeRecord =await Query(RechargeRecord,{"orderid":orderId});
         if(rechargeRecord == null){
             return false;

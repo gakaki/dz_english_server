@@ -2,7 +2,7 @@ import {action, debug, develop, IRouter} from "../../nnt/core/router";
 import {RechargeRecord, TestOrder} from "../model/shop";
 import {Trans} from "../server/trans";
 import {mid_str, Null, STATUS} from "../../nnt/core/models";
-import {Insert, Update} from "../../nnt/manager/dbmss";
+import {Count, Insert, Query, QueryAll, Update} from "../../nnt/manager/dbmss";
 import {Delta, Item} from "../model/item";
 import {User} from "./user";
 import {configs} from "../model/xlsconfigs";
@@ -16,6 +16,10 @@ import {ItemRecordType} from "../model/user";
 import {Msg} from "./msg";
 import {DOMAIN_USERS, SYSTEM} from "../../nnt/server/im";
 import {ImChatMsg, ImMsgSubType, ImMsgType} from "../model/msg";
+import {Guessnum} from "./guessnum";
+import {PackGuessRecord, PackInfo} from "../model/guessnum";
+import {Code} from "../model/code";
+import {pack} from "d3-hierarchy";
 
 export class Shop implements IRouter {
     action = "shop";
@@ -104,9 +108,48 @@ export class Shop implements IRouter {
         }, {$set: {close: true}}]);
         if (!rcd)
             return;
-
+        console.log(rcd);
         let ui = await User.FindUserInfo(rcd.pid);
-        let delta = Delta.Item(Item.FromIndex(configs.Item.MONEY)).record(ItemRecordType.BUY);
+       //生成红包
+        let pack:PackInfo = new PackInfo();
+        pack.pid = Date.now();
+        pack.uid=ui.uid;
+        pack.orderId=rcd.orderid;
+        pack.useTicket=false;
+        pack.title=rcd.title;
+        pack.password = Guessnum.getCode();
+        let money=rcd.price;
+        pack.money=Math.floor(money*100);
+        pack.remain = Math.floor(money*100);
+
+        pack.status = Code.PACK_Fighing;
+
+        console.log(pack);
+        await Insert(PackInfo, pack);
+        pack.userInfo=ui;
+        let cost = new Delta();
+        cost.addkv(configs.Item.ACCELERATION,2);
+        await User.ApplyDelta(ui, cost);
+        setTimeout(async function () {
+            console.log("红包要过期了");
+            console.log("红包id: " + pack.pid);
+            let packInfo = await await Query(PackInfo,{pid:pack.pid});
+            console.log(packInfo);
+            packInfo.status=Code.PACK_EXPIRED;
+            await Update(PackInfo,null,[{pid:packInfo.pid},packInfo]);
+
+            let recordsCount=await  Count(PackGuessRecord,{pid:packInfo.pid});
+            if(recordsCount>0){
+                console.log("有竞猜记录");
+                let cost = new Delta();
+                cost.addkv(configs.Item.MONEY, packInfo.remain);
+                await User.ApplyDelta(ui, cost);
+            }else{
+                console.log("没有竞猜记录");
+                await Guessnum.refund(ui.pid,packInfo.orderId);
+            }
+
+        },Number(configs.Parameter.Get("expire").value)*60*60*1000);
 
 
      //   console.log("用户当前金额");
