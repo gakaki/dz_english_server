@@ -46,8 +46,12 @@ export class Guessnum implements IRouter {
         }
         if(m.orderId){
             let pack=await Query(PackInfo,{"orderId":m.orderId});
+            console.log("查询到的红包");
+            console.log(pack);
             if(pack !=null){
                 m=pack;
+                console.log("返回的红包");
+                console.log(m);
                 trans.submit();
                 return;
             }else{
