@@ -1,9 +1,8 @@
 import {action, debug, develop, frqctl, IRouter} from "../../nnt/core/router";
 import {
-    Acceleration,
     ClearCD, GetPack, Guess, PackGuessRecord, PackInfo, PackRankingList, PackRecords, RankInfo, ReceivePackage,
     SendPackage,
-    UserPackRecord,
+    UserPackRecord, UserShareRecord,
 } from "../model/guessnum";
 import {Trans} from "../../contrib/manager/trans";
 import {UserInfo} from "../model/user";
@@ -402,38 +401,35 @@ export class Guessnum implements IRouter {
         trans.submit()
     }
    //获取加速卡
-   @action(Acceleration)
+   @action(UserShareRecord)
    async getacceleration(trans:Trans){
-       let m:Acceleration = trans.model;
+       let m:UserShareRecord = trans.model;
        let ui:UserInfo=await User.FindUserBySid(trans.sid);
        if(ui==null){
            trans.status = Code.USER_NOT_FOUND;
            trans.submit();
            return
        }
-       let localData=new Date().toLocaleDateString();
-       let rootPath="./minAPPShare/";
-       let firstPth=rootPath+ui.uid+"/";
-       let secondPath=firstPth+localData+"/";
-       try{
-           if(!await fs.existsSync(rootPath)){
-               await fs.mkdirSync(rootPath);
-           }
-           if(!await fs.existsSync(firstPth)){
-               await fs.mkdirSync(firstPth);
-           }
-           if(!await fs.existsSync(secondPath)){
-               //每日首次分享
-               let delta = new Delta();
-               delta.addkv(configs.Item.ACCELERATION,1);
-               await User.ApplyDelta(ui,delta);
-               await fs.mkdirSync(secondPath);
-           }else{
-               trans.status=Code.PACK_ISSHARED;
-           }
-       }catch (err){
-           logger.warn("文件IO异常: "+err);
+       m.uid=ui.uid;
+     //  m.uid="123";
+       m.createDate=new Date().toLocaleDateString();
+       m.createTime=new Date().toLocaleTimeString();
+       let count =await Count(UserShareRecord,{"uid":m.uid,"createDate":m.createDate});
+       if(count <1){
+           let delta = new Delta();
+           delta.addkv(configs.Item.ACCELERATION,1);
+           await User.ApplyDelta(ui,delta);
+           m.num=1;
+           m.getItem=true;
+           m.itemId=configs.Item.ACCELERATION;
+       }else{
+           m.num=0;
+           m.getItem=false;
+           m.itemId=configs.Item.ACCELERATION;
        }
+
+       console.log(m);
+       Insert(UserShareRecord,m);
 
        trans.submit();
    }

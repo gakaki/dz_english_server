@@ -116,7 +116,7 @@ export class Shop implements IRouter {
         pack.uid=ui.uid;
         pack.orderId=rcd.orderid;
         pack.useTicket=false;
-        pack.title=rcd.title;
+        pack.title=rcd.title||"新年快乐！快来领福利";
         pack.password = Guessnum.getCode();
         let money=rcd.price;
         pack.money=Math.floor(money);

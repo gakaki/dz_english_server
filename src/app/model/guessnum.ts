@@ -257,10 +257,22 @@ export class UserPackRecord{
 
 }
 @model()
-export class Acceleration{
+@table("kv","user_share_record")
+export class UserShareRecord{
 
-    @integer(1,[output])
+    @colstring()
+    createDate:string;
+    @colstring()
+    createTime:string;
+    @colstring()
+    uid:string;
+    @integer(1,[output],"获取的道具数量")
+    @colinteger()
     num:number;
-
-
+    @boolean(2,[output],"是否获取道具")
+    @colboolean()
+    getItem:boolean;
+    @integer(3,[output],"道具编号")
+    @colinteger()
+    itemId:number;
 }
