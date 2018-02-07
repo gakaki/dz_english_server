@@ -230,7 +230,7 @@ export class User implements IRouter {
        }
        let srv = static_cast<Api>(trans.server);
        let payInfo:RechargeRecord = new RechargeRecord();
-       payInfo.price = m.payCount*100;
+       payInfo.price = Math.floor(m.payCount*100);
        payInfo.title = m.title;
        //payInfo.price = 1;
        payInfo.time = DateTime.Current();
